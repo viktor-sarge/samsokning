@@ -11,7 +11,11 @@ class HTMLwriter:
         print "<HTML>"
         print "<HEAD>"
         print "<TITLE>" + "Sams&ouml;kning i Halland" + "</TITLE>"
-        print "</BODY>"
+        print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
+        print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
+        print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
+        print "</HEAD>"
+        print "<BODY>"
     
     def closeBasicPage(self):
         print "</BODY>"
@@ -35,7 +39,16 @@ class HTMLwriter:
             
     def output2dList(self, storage):
         
-        print "<table>"
+        print '<table>'
+        print '<thead>'
+        print '<tr>'
+        print '<th>Titel</th>'
+        print '<th>Bibliotek</th>'
+        print '<th>Klassning</th>'
+        print '<th>Typ</th>'
+        print '</tr>'
+        print '</thead>'
+        print '<tbody>'
         for row in storage:
             print "<tr>"
             for field in row: 
@@ -43,7 +56,7 @@ class HTMLwriter:
                 print field
                 print "</td>"
             print "</tr>"
-        print "</table>"
+        print "</tbody></table>"
         #print "<ol>"
         #for row in storage:
         #    print "<li>"
