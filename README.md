@@ -7,7 +7,7 @@ Denna första version är tänkt som en demo av funktionaliteten och skall inte 
 
 Installation: 
 * Spara skriptet på din egen dator. 
-* Ladda upp det via något FTP-program (ex Filezilla) till en webbserver med stöd för Python. Vi använder själva t.ex. ett webbhotell från Loopia. 
+* Ladda upp det via något FTP-program (ex Filezilla) till en webbserver med stöd för Python. Vi använder själva t.ex. ett vanligt webbhotellskonto från Loopia. 
 * Lägg skriptet i den mapp på servern där program skall läggas. Hos Loopia är det t.ex. cgi-bin vilket ger adressen www.mittwebbhotell.se/cgi-bin/samsok.py.
 * Ställ filrättighetern (högerklicka och välj "Filrättigheter" i Filezilla) till värdet 755. 
 * Navigera till den adress du gett skriptet och testa det. 
