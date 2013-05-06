@@ -18,7 +18,7 @@ class HTMLwriter:
         print "</HTML>"
         
     def outputSearchbox(self):
-        print '<form name="input" action="samsok-hall2.py" method="get">'
+        print '<form name="input" action="samsok.py" method="get">'
         print '<input type="text" name="search">'
         print '<input type="submit" value="S&ouml;k">'
         print '</form>'
@@ -31,7 +31,7 @@ class HTMLwriter:
         form = cgi.FieldStorage()
         if "search" in form:
             #print '"Search" was in form - if statement filled'
-            print "Din s&ouml;kning p&aring; " + form['search'].value + " gav " + numbers + " tr&auml;ffar i" + location + "<br>\n"
+            print "Din s&ouml;kning p&aring; " + form['search'].value + " gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
             
     def output2dList(self, storage):
         
