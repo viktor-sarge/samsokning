@@ -8,8 +8,10 @@ class HTMLwriter:
     def startBasicPage(self):
         print "Content-type: text/html"
         print
+        print "<!DOCTYPE html>"
         print "<html>"
         print "<head>"
+        print '<meta charset="UTF-8">'
         print "<title>" + "Sams&ouml;kning i Halland" + "</title>"
         print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
         print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
