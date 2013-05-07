@@ -42,7 +42,11 @@ class HTMLwriter:
         form = cgi.FieldStorage()
         if "search" in form:
             #print '"Search" was in form - if statement filled'
-            print "Din s&ouml;kning gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
+            if numbers:
+                print "Din s&ouml;kning gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
+            else: 
+                print "Din s&ouml;kning gav 0 tr&auml;ffar i " + location + "<br>\n"
+
             
     def output2dList(self, storage):
         
@@ -178,7 +182,7 @@ if "search" in form:
     # Searching Laholm
     page = connector.getpage('http://laholmopac.kultur.halmstad.se/opac/search_result.aspx?TextFritext=' + form['search'].value) 
     parser = opacParser()
-    storage, hitnumbers = parser.parseLibra(page,"laholm", storage,'http://laholmopac.kultur.halmstad.se/opac/')
+    storage, hitnumbers = parser.parseLibra(page,"Laholm", storage,'http://laholmopac.kultur.halmstad.se/opac/')
     #print "Calculating number of total hits" 
     #totalhits = totalhits + hitnumbers
     print '<h1>Resultat f&ouml;r "' + form['search'].value +  '"</h1>'
