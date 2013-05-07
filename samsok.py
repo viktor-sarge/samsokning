@@ -16,15 +16,22 @@ class HTMLwriter:
         print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
         print "</HEAD>"
         print "<BODY>"
+        print '<DIV data-role="page">'
+        print '<DIV data-role="header">'
+        print "<h1>Sams&ouml;kning i Halland</h1>"
+        print '</DIV>'
+        print '<DIV data-role="content">'
     
     def closeBasicPage(self):
+        print '</div>'
+        print '</DIV>'
         print "</BODY>"
         print "</HTML>"
         
     def outputSearchbox(self):
         print '<form name="input" action="samsok.py" method="get">'
         print '<input type="text" name="search">'
-        print '<input type="submit" value="S&ouml;k">'
+        print '<input type="submit" value="S&ouml;k" data-role="button" data-inline="true">'
         print '</form>'
 
     def outputResultsnumbers(self,numbers, location):
@@ -35,35 +42,37 @@ class HTMLwriter:
         form = cgi.FieldStorage()
         if "search" in form:
             #print '"Search" was in form - if statement filled'
-            print "Din s&ouml;kning p&aring; " + form['search'].value + " gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
+            print "Din s&ouml;kning gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
             
     def output2dList(self, storage):
         
-        print '<table>'
-        print '<thead>'
-        print '<tr>'
-        print '<th>Titel</th>'
-        print '<th>Bibliotek</th>'
-        print '<th>Klassning</th>'
-        print '<th>Typ</th>'
-        print '</tr>'
-        print '</thead>'
-        print '<tbody>'
-        for row in storage:
-            print "<tr>"
-            for field in row: 
-                print "<td>"
-                print field
-                print "</td>"
-            print "</tr>"
-        print "</tbody></table>"
-        #print "<ol>"
+        #print '<table>'
+        #print '<thead>'
+        #print '<tr>'
+        #print '<th>Titel</th>'
+        #print '<th>Bibliotek</th>'
+        #print '<th>Klassning</th>'
+        #print '<th>Typ</th>'
+        #print '</tr>'
+        #print '</thead>'
+        #print '<tbody>'
         #for row in storage:
-        #    print "<li>"
+        #    print "<tr>"
         #    for field in row: 
-        #        print field 
-        #    print "</li>"               
-        #print "</ol>"
+        #        print "<td>"
+        #        print field
+        #        print "</td>"
+        #    print "</tr>"
+        #print "</tbody></table>"
+        print "<p>"
+        print '<ul data-role="listview" data-filter="true" data-filter-placeholder="Filtrera tr&auml;fflistan">'
+        for row in storage:
+            print "<li>"
+            for field in row: 
+                print field 
+            print "</li>"               
+        print "</ul>"
+        print "</p>"
 
 class connectorclass: 
     'Knows how to fetch the different library opacs'
@@ -172,7 +181,7 @@ if "search" in form:
     storage, hitnumbers = parser.parseLibra(page,"laholm", storage,'http://laholmopac.kultur.halmstad.se/opac/')
     #print "Calculating number of total hits" 
     #totalhits = totalhits + hitnumbers
-    print "<h1>Resultat</h1>"
+    print '<h1>Resultat f&ouml;r "' + form['search'].value +  '"</h1>'
     HTMLmachine.outputResultsnumbers(hitnumbers,"Laholm")
     
     # Searching Halmstad
@@ -181,6 +190,13 @@ if "search" in form:
     #print "Calculating number of total hits" 
     #totalhits = totalhits + hitnumbers
     HTMLmachine.outputResultsnumbers(hitnumbers,"Halmstad")
+    
+    # Searching Falkenberg
+    page = connector.getpage('http://www5.falkenberg.se/opac/opac/search_result.aspx?TextFritext=' + form['search'].value) 
+    storage, hitnumbers = parser.parseLibra(page,"Falkenberg", storage,'http://www5.falkenberg.se/opac/opac/')
+    #print "Calculating number of total hits" 
+    #totalhits = totalhits + hitnumbers
+    HTMLmachine.outputResultsnumbers(hitnumbers,"Falkenberg")
     
     # Searching Varberg
     page = connector.getpage('http://bib.varberg.se/opac/search_result.aspx?TextFritext=' + form['search'].value) 
