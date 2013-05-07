@@ -76,6 +76,7 @@ class HTMLwriter:
             print "<li>"
             for field in row: 
                 print field 
+            print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
             print "</li>"               
         print "</ul>"
         print "</p>"
