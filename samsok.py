@@ -8,25 +8,25 @@ class HTMLwriter:
     def startBasicPage(self):
         print "Content-type: text/html"
         print
-        print "<HTML>"
-        print "<HEAD>"
-        print "<TITLE>" + "Sams&ouml;kning i Halland" + "</TITLE>"
+        print "<html>"
+        print "<head>"
+        print "<title>" + "Sams&ouml;kning i Halland" + "</title>"
         print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
         print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
         print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
-        print "</HEAD>"
-        print "<BODY>"
-        print '<DIV data-role="page">'
-        print '<DIV data-role="header">'
+        print "</head>"
+        print "<body>"
+        print '<div data-role="page">'
+        print '<div data-role="header">'
         print "<h1>Sams&ouml;kning i Halland</h1>"
-        print '</DIV>'
-        print '<DIV data-role="content">'
+        print '</div>'
+        print '<div data-role="content">'
     
     def closeBasicPage(self):
         print '</div>'
-        print '</DIV>'
-        print "</BODY>"
-        print "</HTML>"
+        print '</div>'
+        print "</body>"
+        print "</html>"
         
     def outputSearchbox(self):
         print '<form name="input" action="samsok.py" method="get">'
