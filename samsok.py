@@ -12,6 +12,7 @@ class HTMLwriter:
         print "<html>"
         print "<head>"
         print '<meta charset="UTF-8">'
+        print '<meta name="viewport" content="width=device-width, initial-scale=1">'
         print "<title>" + "Sams&ouml;kning i Halland" + "</title>"
         print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
         print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
@@ -48,8 +49,7 @@ class HTMLwriter:
                 print "Din s&ouml;kning gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
             else: 
                 print "Din s&ouml;kning gav 0 tr&auml;ffar i " + location + "<br>\n"
-
-            
+          
     def output2dList(self, storage):
         
         #print '<table>'
@@ -74,6 +74,8 @@ class HTMLwriter:
         print '<ul data-role="listview" data-filter="true" data-filter-placeholder="Filtrera tr&auml;fflistan">'
         for row in storage:
             print "<li>"
+            #print '<h2>' + row[0] +'</h2>'
+            #print '<p>' + row[1] + ', ' + row[2] + ', ' + row[3] + '</p>'
             for field in row: 
                 print field 
             print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
@@ -157,11 +159,6 @@ class opacParser:
         #print hitlist
         return storage, hitnumbers
         
-class metadatastorage:
-
-    def __init__(self): 
-        metalist = []
-        
 class metadataSortmachine: 
     
     def groupByTitle(self,list):
@@ -176,7 +173,7 @@ import cgi
 HTMLmachine = HTMLwriter()
 HTMLmachine.startBasicPage()
 HTMLmachine.outputSearchbox()
-storage = [] # metadatastorage()
+storage = []
 connector = connectorclass()
 form = cgi.FieldStorage()
 
