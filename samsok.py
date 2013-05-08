@@ -77,9 +77,11 @@ class HTMLwriter:
             print "</tbody></table>"
         else: 
             print "<p>"
-            print '<ul data-role="listview" data-filter="true" data-filter-placeholder="Filtrera tr&auml;fflistan">'
+            print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan">'
             for row in storage:
                 print "<li>"
+                
+                        
                 #print '<h2>' + row[0] +'</h2>'
                 #print '<p>' + row[1] + ', ' + row[2] + ', ' + row[3] + '</p>'
                 for field in row: 
