@@ -80,12 +80,21 @@ class HTMLwriter:
             print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan">'
             for row in storage:
                 print "<li>"
+                print row[0]
+                print '<p style="padding-left:2em;">'
+                if row[2]:
+                    print row[2] 
+                if row[3]:
+                    print row[3]
+                if row[4]:
+                    print row[4] 
+                print '</p>'
+                print '<p style="padding-left:2em;">' + row[1] + '</p>'
                 
-                        
                 #print '<h2>' + row[0] +'</h2>'
                 #print '<p>' + row[1] + ', ' + row[2] + ', ' + row[3] + '</p>'
-                for field in row: 
-                    print field 
+                #for field in row: 
+                #    print field 
                 print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
                 print "</li>"               
             print "</ul>"
