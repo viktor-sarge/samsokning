@@ -13,15 +13,20 @@ class HTMLwriter:
         print "<head>"
         print '<meta charset="UTF-8">'
         print '<meta name="viewport" content="width=device-width, initial-scale=1">'
-        print "<title>" + "Sams&ouml;kning i Halland" + "</title>"
+        print "<title>" + "Sams&ouml;k Halland" + "</title>"
         print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
         print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
         print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
         print "</head>"
         print "<body>"
         print '<div data-role="page">'
+        print '<div data-role="panel" id="infopanel">'
+        print '<p>Sams&ouml;k Halland &auml;r en tj&auml;nst fr&aring;n <a href="http://www.regionhalland.se/regionbibliotek">Kultur i Halland - Regionbibliotek</a> t&auml;nkt att fungera som ers&auml;ttare f&ouml;r Bibliotek24 i fj&auml;rrl&aring;earbetet.</p>'
+        print '<p>Tj&auml;nsten &auml;r under uppbyggnad och synpunkter mottages tacksamt till viktor [punkt] sarge [snabela] regionhalland [punkt] se</p>'
+        print '<p>K&auml;llkoden finns p&aring; <a href="http://github.com/regionbibliotekhalland/samsokning">regionbibliotekets Github-konto</a></p>'
+        print '</div><!-- /panel -->'
         print '<div data-role="header">'
-        print "<h1>Sams&ouml;kning i Halland</h1>"
+        print '<a href="#infopanel">Info</a><h1>Sams&ouml;k Halland</h1>'
         print '</div>'
         print '<div data-role="content">'
     
@@ -50,38 +55,39 @@ class HTMLwriter:
             else: 
                 print "Din s&ouml;kning gav 0 tr&auml;ffar i " + location + "<br>\n"
           
-    def output2dList(self, storage):
-        
-        #print '<table>'
-        #print '<thead>'
-        #print '<tr>'
-        #print '<th>Titel</th>'
-        #print '<th>Bibliotek</th>'
-        #print '<th>Klassning</th>'
-        #print '<th>Typ</th>'
-        #print '</tr>'
-        #print '</thead>'
-        #print '<tbody>'
-        #for row in storage:
-        #    print "<tr>"
-        #    for field in row: 
-        #        print "<td>"
-        #        print field
-        #        print "</td>"
-        #    print "</tr>"
-        #print "</tbody></table>"
-        print "<p>"
-        print '<ul data-role="listview" data-filter="true" data-filter-placeholder="Filtrera tr&auml;fflistan">'
-        for row in storage:
-            print "<li>"
-            #print '<h2>' + row[0] +'</h2>'
-            #print '<p>' + row[1] + ', ' + row[2] + ', ' + row[3] + '</p>'
-            for field in row: 
-                print field 
-            print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
-            print "</li>"               
-        print "</ul>"
-        print "</p>"
+    def output2dList(self, storage, mode):
+        if mode == "table":
+            print '<table>'
+            print '<thead>'
+            print '<tr>'
+            print '<th>Titel</th>'
+            print '<th>Bibliotek</th>'
+            print '<th>Klassning</th>'
+            print '<th>Typ</th>'
+            print '</tr>'
+            print '</thead>'
+            print '<tbody>'
+            for row in storage:
+                print "<tr>"
+                for field in row: 
+                    print "<td>"
+                    print field
+                    print "</td>"
+                print "</tr>"
+            print "</tbody></table>"
+        else: 
+            print "<p>"
+            print '<ul data-role="listview" data-filter="true" data-filter-placeholder="Filtrera tr&auml;fflistan">'
+            for row in storage:
+                print "<li>"
+                #print '<h2>' + row[0] +'</h2>'
+                #print '<p>' + row[1] + ', ' + row[2] + ', ' + row[3] + '</p>'
+                for field in row: 
+                    print field 
+                print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
+                print "</li>"               
+            print "</ul>"
+            print "</p>"
 
 class connectorclass: 
     'Knows how to fetch the different library opacs'
@@ -169,7 +175,9 @@ class metadataSortmachine:
         return list  
             
         
-import cgi        
+import cgi  
+import cgitb
+cgitb.enable()     
 HTMLmachine = HTMLwriter()
 HTMLmachine.startBasicPage()
 HTMLmachine.outputSearchbox()
@@ -211,7 +219,7 @@ if "search" in form:
     
     sorter = metadataSortmachine()
     storage = sorter.groupByTitle(storage)
-    HTMLmachine.output2dList(storage)
+    HTMLmachine.output2dList(storage,"list")
 
 HTMLmachine.closeBasicPage()
 
