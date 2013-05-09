@@ -2,6 +2,8 @@
 
 # -*- coding: utf-8 -*-
 
+from HTMLParser import HTMLParser
+
 class HTMLwriter:
     'A class to handle output of HTML'
     
@@ -80,21 +82,16 @@ class HTMLwriter:
             print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan">'
             for row in storage:
                 print "<li>"
-                print row[0]
+                print '<a href="' + row[5] + '">'+ row[0] + '</a>'
                 print '<p style="padding-left:2em;">'
                 if row[2]:
                     print row[2] 
                 if row[3]:
                     print row[3]
                 if row[4]:
-                    print row[4] 
+                    print row[4]
                 print '</p>'
                 print '<p style="padding-left:2em;">' + row[1] + '</p>'
-                
-                #print '<h2>' + row[0] +'</h2>'
-                #print '<p>' + row[1] + ', ' + row[2] + ', ' + row[3] + '</p>'
-                #for field in row: 
-                #    print field 
                 print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
                 print "</li>"               
             print "</ul>"
@@ -112,6 +109,21 @@ class connectorclass:
         content = page.read()
         page.close()     
         return content
+ 
+# HTML-stripping function by Eloff http://stackoverflow.com/questions/753052/strip-html-from-strings-in-python        
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()   
         
 class opacParser:
     'Knows how to parse the different library opacs'
@@ -151,7 +163,7 @@ class opacParser:
                 cellvalue = thiscell[thiscell.find('<td>')+4:thiscell.find('</td>')]
                 #print "Denna cell:" + cellvalue + "<br>\n"
                 thiscell = thiscell[thiscell.find('</td>')+5:]
-                temprow.append(cellvalue)
+                temprow.append(cellvalue.strip())
             #print "Outside the for loop now"
             storage.append(temprow)
             #print "Appeding temprow to storage was ok"
@@ -169,9 +181,15 @@ class opacParser:
             
             # Making the relative URLs from the source point at the right source. 
             urlfield = row.pop(2)
-            urlfield = urlfield.replace('href="','href='+baseurl)
-            row.insert(2,urlfield)
-         
+            searchfor = 'href="'
+            replace = 'href="' + baseurl
+            urlfield = urlfield.replace(searchfor, replace)
+            urlToOpac = urlfield[urlfield.find('href=')+6:urlfield.find('">')]
+            title = strip_tags(urlfield)
+            row.insert(2,title)
+            row.append(urlToOpac)
+            
+            
         
         #print hitlist
         return storage, hitnumbers
@@ -182,7 +200,7 @@ class metadataSortmachine:
         for row in list: 
             title = row.pop(2)
             row.insert(0,title)
-        list.sort()
+        list = sorted(list)
         return list  
             
         
