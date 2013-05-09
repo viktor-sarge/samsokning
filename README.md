@@ -18,4 +18,6 @@ Programmet är ganska enkelt att modifiera om man är en liten aning van vid att
 För närvarande krävs att man manuellt ändrar de URLer som är angivna. Notera att man i skrivande stund endast kan söka i Libra.se-kataloger.
 En förhoppning är att kunna bygga kopplingar även till övriga system som är vanliga på den svenska marknaden. 
 
-Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av.
+Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av. Programmet är fri mjukvara och licensierat under version 3 av GPL-licensen.
+
+Kontakt: Programmet är skrivet av Viktor Sarge på Kultur i Halland - regionbibliotek. Viktor kan nås på adress 'viktor [punkt] sarge [snabela] regionhalland [punkt] se'
