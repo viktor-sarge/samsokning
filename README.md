@@ -13,5 +13,9 @@ Installation:
 * Navigera till den adress du gett skriptet och testa det. 
 * Om du döper om skriptet till något annat än "samsok.py" behöver du också ändra sökvägen i koden som skapar "Submit"-knappen. 
 
-Modifieringar: 
-Det är tämligen enkelt att modifiera programmet och testköra med egna bibliotek. Programmet skall dock snyggas till en del under året så posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av.
+Samsöka egna bibliotek:
+Programmet är ganska enkelt att modifiera om man är en liten aning van vid att läsa kod.
+För närvarande krävs att man manuellt ändrar de URLer som är angivna. Notera att man i skrivande stund endast kan söka i Libra.se-kataloger.
+En förhoppning är att kunna bygga kopplingar även till övriga system som är vanliga på den svenska marknaden. 
+
+Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av.
