@@ -24,19 +24,19 @@ class HTMLwriter:
     'A class to handle output of HTML'
     
     def startBasicPage(self):
-        print "Content-type: text/html"
+        print 'Content-type: text/html'
         print
-        print "<!DOCTYPE html>"
-        print "<html>"
-        print "<head>"
+        print '<!DOCTYPE html>'
+        print '<html>'
+        print '<head>'
         print '<meta charset="UTF-8">'
         print '<meta name="viewport" content="width=device-width, initial-scale=1">'
-        print "<title>" + "Sams&ouml;k Halland" + "</title>"
+        print '<title>' + 'Sams&ouml;k Halland' + '</title>'
         print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
         print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
         print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
-        print "</head>"
-        print "<body>"
+        print '</head>'
+        print '<body>'
         print '<div data-role="page">'
         print '<div data-role="panel" id="infopanel">'
         print '<p>Sams&ouml;k Halland &auml;r en tj&auml;nst fr&aring;n <a href="http://www.regionhalland.se/regionbibliotek">Kultur i Halland - Regionbibliotek</a> t&auml;nkt att fungera som ers&auml;ttare f&ouml;r Bibliotek24 i fj&auml;rrl&aring;earbetet.</p>'
@@ -51,8 +51,8 @@ class HTMLwriter:
     def closeBasicPage(self):
         print '</div>'
         print '</div>'
-        print "</body>"
-        print "</html>"
+        print '</body>'
+        print '</html>'
         
     def outputSearchbox(self):
         print '<form name="input" action="samsok.py" method="get">'
@@ -66,9 +66,9 @@ class HTMLwriter:
         form = cgi.FieldStorage()
         if "search" in form:
             if numbers:
-                print "Din s&ouml;kning gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
+                print 'Din s&ouml;kning gav ' + numbers + ' tr&auml;ffar i ' + location + '<br>\n'
             else: 
-                print "Din s&ouml;kning gav 0 tr&auml;ffar i " + location + "<br>\n"
+                print 'Din s&ouml;kning gav 0 tr&auml;ffar i ' + location + '<br>\n'
           
     def output2dList(self, storage, mode):
         if mode == "table":
@@ -83,18 +83,18 @@ class HTMLwriter:
             print '</thead>'
             print '<tbody>'
             for row in storage:
-                print "<tr>"
+                print '<tr>'
                 for field in row: 
-                    print "<td>"
+                    print '<td>'
                     print field
-                    print "</td>"
-                print "</tr>"
-            print "</tbody></table>"
+                    print '</td>'
+                print '</tr>'
+            print '</tbody></table>'
         else: 
-            print "<p>"
+            print '<p>'
             print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan" data-autodividers="true">'
             for row in storage:
-                print "<li>"
+                print '<li>'
                 print '<a href="' + row[5] + '">'+ row[0] + '</a>'
                 print '<p style="padding-left:2em;">'
                 if row[2]:
@@ -107,8 +107,8 @@ class HTMLwriter:
                 print '<p style="padding-left:2em;">' + row[1] + '</p>'
                 print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
                 print "</li>"               
-            print "</ul>"
-            print "</p>"
+            print '</ul>'
+            print '</p>'
 
 class connectorclass: 
     'Knows how to fetch the different library opacs'
@@ -122,12 +122,12 @@ class connectorclass:
         content = page.read()
         page.close()     
         return content 
-  
+ 
 def strip_tags(raw_html):
     cleanr = re.compile('<.*?>')
     cleantext = re.sub(cleanr,'', raw_html)
     return cleantext
-        
+         
 class opacParser:
     'Knows how to parse the different library opacs'
     
@@ -222,8 +222,7 @@ class metadataSortmachine:
             row.insert(0,title)
         list = sorted(list)
         return list  
-            
-        
+                    
 import cgi  
 import cgitb
 
@@ -237,9 +236,9 @@ form = cgi.FieldStorage()
 
 #totalhits = 0
 if "search" in form:
+    parser = opacParser()
     # Searching Laholm
     page = connector.getpage('http://laholmopac.kultur.halmstad.se/opac/search_result.aspx?TextFritext=' + form['search'].value) 
-    parser = opacParser()
     storage, hitnumbers = parser.parseLibra(page,"Laholm", storage,'http://laholmopac.kultur.halmstad.se/opac/')
     #print "Calculating number of total hits" 
     #totalhits = totalhits + hitnumbers
@@ -279,4 +278,3 @@ if "search" in form:
     HTMLmachine.output2dList(storage,"list")
 
 HTMLmachine.closeBasicPage()
-
