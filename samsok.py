@@ -92,7 +92,7 @@ class HTMLwriter:
             print "</tbody></table>"
         else: 
             print "<p>"
-            print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan">'
+            print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan" data-autodividers="true">'
             for row in storage:
                 print "<li>"
                 print '<a href="' + row[5] + '">'+ row[0] + '</a>'
