@@ -18,8 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from HTMLParser import HTMLParser
+import re
 
 class HTMLwriter:
     'A class to handle output of HTML'
@@ -62,13 +61,10 @@ class HTMLwriter:
         print '</form>'
 
     def outputResultsnumbers(self,numbers, location):
-        #print "Inside outputResultnumbers"
-        #print "Numbers innehaller:" #+ numbers
-        import cgi
 
+        import cgi
         form = cgi.FieldStorage()
         if "search" in form:
-            #print '"Search" was in form - if statement filled'
             if numbers:
                 print "Din s&ouml;kning gav " + numbers + " tr&auml;ffar i " + location + "<br>\n"
             else: 
@@ -125,22 +121,36 @@ class connectorclass:
         page = urllib.urlopen(url)
         content = page.read()
         page.close()     
-        return content
+        return content 
  
-# HTML-stripping function by Eloff http://stackoverflow.com/questions/753052/strip-html-from-strings-in-python        
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
+from HTMLParser import HTMLParser
+import htmlentitydefs
 
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()   
+class HTMLTextExtractor(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.result = [ ]
+
+    def handle_data(self, d):
+        self.result.append(d)
+
+    def handle_charref(self, number):
+        codepoint = int(number[1:], 16) if number[0] in (u'x', u'X') else int(number)
+        self.result.append(unichr(codepoint))
+
+    def handle_entityref(self, name):
+        codepoint = htmlentitydefs.name2codepoint[name]
+        self.result.append(unichr(codepoint))
+
+    def get_text(self):
+        return u''.join(self.result)
+ 
+def strip_tags(raw_html):
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr,'', raw_html)
+    return cleantext
+ 
+ 
         
 class opacParser:
     'Knows how to parse the different library opacs'
@@ -162,40 +172,60 @@ class opacParser:
         hitlist = content[content.find('<table class="list"'):]
         hitlist = hitlist[:hitlist.find('</table>')]
         
-        #print "Closing in on the parsing of the hitlist<br>\n"
         line = hitlist
+        
+        # Creates a key for how the table is structured 
+        header_row = hitlist[hitlist.find('<tr>')+4:hitlist.find('</tr>')]
+        headers_key = {}
+        ordercount = 0
+        while len(header_row) > 0:
+            this_field = header_row[header_row.find('<th'):header_row.find('</th>')]
+            header_row = header_row[header_row.find('</th>')+5:]
+            this_field = strip_tags(this_field)
+            headers_key[this_field] = ordercount
+            ordercount = ordercount + 1         
+            
         # Strip the first row with headers
         hitlist = hitlist[hitlist.find('</tr>')+5:]
         hitlist = hitlist.replace('<td >','<td>')
+
         # The loop to parse the full table with info 
         while len(hitlist) > 0:
-            #print "Inside the while loop for parsing the hitlist!<br>\n"
             temprow = [location]
-            #print temprow
             thisrow = hitlist[:hitlist.find('</tr>')+5]
-            #print thisrow
             thiscell = thisrow
-            for i in range(0,4,1): 
-                #print "Inside for loop<br>\n"
+            for i in range(0,5,1): 
                 cellvalue = thiscell[thiscell.find('<td>')+4:thiscell.find('</td>')]
-                #print "Denna cell:" + cellvalue + "<br>\n"
                 thiscell = thiscell[thiscell.find('</td>')+5:]
                 temprow.append(cellvalue.strip())
-            #print "Outside the for loop now"
-            storage.append(temprow)
-            #print "Appeding temprow to storage was ok"
+                
+            # Ordering the temprow to a standardised form with the use of headers_key
+            # Adding city to target row (also corrects the index numbers s
+            target_row = [temprow.pop(0)]
+            if 'F\xc3\xb6rfattare' in headers_key:
+                target_row.append(temprow[headers_key['F\xc3\xb6rfattare']])
+            else:
+                target_row.append('')
+            if 'Titel' in headers_key:
+                target_row.append(temprow[headers_key['Titel']])
+            else:
+                target_row.append('')
+            if 'Medietyp' in headers_key:
+                medietyp = temprow[headers_key['Medietyp']]
+                medietyp = strip_tags(medietyp)
+                target_row.append(medietyp)
+            else:
+                target_row.append('')
+            if '\xc3\x85r' in headers_key:
+                target_row.append(temprow[headers_key['\xc3\x85r']])
+            else:
+                target_row.append('')
+    
+            storage.append(target_row)
             hitlist = hitlist[hitlist.find('</tr>')+5:]
-        #print storage
         
         # Cleaning up the contents a bit and removing remaining html
         for row in storage:
-            # Stripping away relative links and changing from icons to text representations. 
-            #mediatype = row.pop(5)
-            #mediatype = mediatype[mediatype.find('alt="')+5:]
-            #mediatype = mediatype[:mediatype.find('"')]
-            #row.insert(4,mediatype)
-            #print row[2]
-            
             # Making the relative URLs from the source point at the right source. 
             urlfield = row.pop(2)
             searchfor = 'href="'
@@ -206,9 +236,6 @@ class opacParser:
             row.insert(2,title)
             row.append(urlToOpac)
             
-            
-        
-        #print hitlist
         return storage, hitnumbers
         
 class metadataSortmachine: 
@@ -223,6 +250,7 @@ class metadataSortmachine:
         
 import cgi  
 import cgitb
+
 cgitb.enable()     
 HTMLmachine = HTMLwriter()
 HTMLmachine.startBasicPage()
@@ -255,6 +283,13 @@ if "search" in form:
     #print "Calculating number of total hits" 
     #totalhits = totalhits + hitnumbers
     HTMLmachine.outputResultsnumbers(hitnumbers,"Falkenberg")
+    
+    # Searching Kungsbacka
+    page = connector.getpage('http://bibold.kungsbacka.se/opac/search_result.aspx?TextFritext=' + form['search'].value) 
+    storage, hitnumbers = parser.parseLibra(page,"Kungsbacka", storage,'http://bibold.kungsbacka.se/opac/')
+    #print "Calculating number of total hits" 
+    #totalhits = totalhits + hitnumbers
+    HTMLmachine.outputResultsnumbers(hitnumbers,"Kungsbacka")    
     
     # Searching Varberg
     page = connector.getpage('http://bib.varberg.se/opac/search_result.aspx?TextFritext=' + form['search'].value) 
