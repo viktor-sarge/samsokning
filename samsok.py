@@ -105,7 +105,27 @@ class HTMLwriter:
                     print row[4]
                 print '</p>'
                 print '<p style="padding-left:2em;">' + row[1] + '</p>'
-                print '<a href="http://libris.kb.se/hitlist?d=libris&q=">S&ouml;k i Libris</a>'
+                libris_query = ""
+                continued_string = 0
+                if row[2]: 
+                    libris_query = libris_query + row[2]
+                    continued_string = 1
+                if row[0]:
+                    if continued_string: 
+                        libris_query = libris_query + '+' + row[0]
+                        continued_string = 1
+                    else: 
+                        libris_query = libris_query + row[0]
+                        continued_string = 1
+                if row[4]:
+                    if continued_string:
+                        libris_query = libris_query + '+' + row[4]
+                        continued_string = 1
+                    else: 
+                        libris_query = libris_query + row[4]
+                        continued_string = 1
+                 
+                print '<a href="http://libris.kb.se/hitlist?d=libris&q=' + libris_query + '">S&ouml;k i Libris</a>'
                 print "</li>"               
             print '</ul>'
             print '</p>'
