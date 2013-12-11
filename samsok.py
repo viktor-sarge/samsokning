@@ -190,7 +190,7 @@ class opacParser:
             temprow = [location]
             thisrow = hitlist[:hitlist.find('</tr>')+5]
             thiscell = thisrow
-            for i in range(0,5,1): 
+            for i in range(0,thisrow.count('<td>'),1): 
                 cellvalue = thiscell[thiscell.find('<td>')+4:thiscell.find('</td>')]
                 thiscell = thiscell[thiscell.find('</td>')+5:]
                 temprow.append(cellvalue.strip())
@@ -258,8 +258,8 @@ form = cgi.FieldStorage()
 if "search" in form:
     parser = opacParser()
     # Searching Laholm
-    page = connector.getpage('http://laholmopac.kultur.halmstad.se/opac/search_result.aspx?TextFritext=' + form['search'].value) 
-    storage, hitnumbers = parser.parseLibra(page,"Laholm", storage,'http://laholmopac.kultur.halmstad.se/opac/')
+    page = connector.getpage('http://opac.laholm.axiell.com/opac/search_result.aspx?TextFritext=' + form['search'].value) 
+    storage, hitnumbers = parser.parseLibra(page,"Laholm", storage,'http://opac.laholm.axiell.com/opac/')
     #print "Calculating number of total hits" 
     #totalhits = totalhits + hitnumbers
     print '<h1>Resultat f&ouml;r "' + form['search'].value +  '"</h1>'
