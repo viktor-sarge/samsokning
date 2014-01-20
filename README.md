@@ -21,4 +21,4 @@ En förhoppning är att kunna bygga kopplingar även till övriga system som är
 
 Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av. Programmet är fri mjukvara och licensierat under version 3 av GPL-licensen.
 
-Kontakt: Programmet är skrivet av Viktor Sarge på Kultur i Halland - regionbibliotek. Viktor kan nås på adress 'viktor [punkt] sarge [snabela] regionhalland [punkt] se'
+Kontakt: Programmet är skrivet av Viktor Sarge på Kultur i Halland - regionbibliotek. Viktor kan nås på adress 'viktor [punkt] sarge [snabela] regionhalland [punkt] se'. Sedan den 20 januari 2014 innehåller programmet också kod av Mattias Persson utvecklad på uppdrag av Kultur i Halland - regionbibliotek. 
