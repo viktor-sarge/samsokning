@@ -22,7 +22,7 @@ import cgi
 import cgitb
 
 from html import HTMLwriter
-from search import performSearch
+from search import performSearch, connectorclass
         
 
 cgitb.enable()     
