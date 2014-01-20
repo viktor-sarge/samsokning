@@ -3,6 +3,10 @@ Created on 16 jan 2014
 
 @author: PC
 '''
+"""
+Print html page.
+
+"""
 class HTMLwriter:
     'A class to handle output of HTML'
     
@@ -10,6 +14,7 @@ class HTMLwriter:
         self._prioroutput = False
 
     def startBasicPage(self):
+        """Print the start of the page"""
         print 'Content-type: text/html'
         print
         print '<!DOCTYPE html>'
@@ -35,22 +40,28 @@ class HTMLwriter:
         print '<div data-role="content">'
     
     def closeBasicPage(self):
+        """Print the end of the page"""
         print '</div>'
         print '</div>'
         print '</body>'
         print '</html>'
         
     def outputSearchbox(self):
+        """Print searchbox"""
         print '<form name="input" action="samsok.py" method="get">'
         print '<input type="text" name="search">'
         print '<input type="submit" value="S&ouml;k" data-role="button" data-inline="true">'
         print '</form>'
 
     def outputResultsnumbers(self,numbers, location):
+        """Print the number of hits at a library
+        
+        Arguments
+        numbers -- hit count
+        location -- library
 
-#        import cgi
-#        form = cgi.FieldStorage()
-#        if "search" in form:
+        """
+
         if numbers:
             print 'Din s&ouml;kning gav ' + numbers + ' tr&auml;ffar i ' + location + '<br>\n'
         else: 
@@ -73,6 +84,13 @@ class HTMLwriter:
             self._prioroutput = True
 
     def output2dList(self, storage, mode):
+        """Print a list of MediaItems
+
+        Arguments
+        storage -- list of MediaItems
+        mode -- select output type; 'table' or 'list' are supported
+
+        """
         if mode == "table":
             print '<table>'
             print '<thead>'
@@ -113,65 +131,6 @@ class HTMLwriter:
             print '</ul>'
             print '</p>'
 
-#def output2dList(self, storage, mode):
-#        if mode == "table":
-#            print '<table>'
-#            print '<thead>'
-#            print '<tr>'
-#            print '<th>Titel</th>'
-#            print '<th>Bibliotek</th>'
-#            print '<th>Klassning</th>'
-#            print '<th>Typ</th>'
-#            print '</tr>'
-#            print '</thead>'
-#            print '<tbody>'
-#            for row in storage:
-#                print '<tr>'
-#                for field in row: 
-#                    print '<td>'
-#                    print field
-#                    print '</td>'
-#                print '</tr>'
-#            print '</tbody></table>'
-#        else: 
-#            print '<p>'
-#            print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan" data-autodividers="true">'
-#            for row in storage:
-#                print '<li>'
-#                print '<a href="' + row[5] + '">'+ row[0] + '</a>'
-#                print '<p style="padding-left:2em;">'
-#                if row[2]:
-#                    print row[2]
-#                if row[3]:
-#                    print row[3]
-#                if row[4]:
-#                    print row[4]
-#                print '</p>'
-#                print '<p style="padding-left:2em;">' + row[1] + '</p>'
-#                libris_query = ""
-#                continued_string = 0
-#                if row[2]:
-#                    libris_query = libris_query + row[2]
-#                    continued_string = 1
-#                if row[0]:
-#                    if continued_string: 
-#                        libris_query = libris_query + '+' + row[0]
-#                        continued_string = 1
-#                    else: 
-#                        libris_query = libris_query + row[0]
-#                        continued_string = 1
-#                if row[4]:
-#                    if continued_string:
-#                        libris_query = libris_query + '+' + row[4]
-#                        continued_string = 1
-#                    else: 
-#                        libris_query = libris_query + row[4]
-#                        continued_string = 1
-#                 
-#                print '<a href="http://libris.kb.se/hitlist?d=libris&q=' + libris_query + '">S&ouml;k i Libris</a>'
-#                print "</li>"               
-#            print '</ul>'
-#            print '</p>'
-
     def outputHitCountHeader(self, query):
+        """Print hit count header"""
         print '<h1>Resultat f&ouml;r "' + query +  '"</h1>'

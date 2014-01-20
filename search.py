@@ -3,6 +3,10 @@ Created on 16 jan 2014
 
 @author: PC
 '''
+"""
+Perform search. 
+
+"""
 import re
 from html import HTMLwriter
 from sources import getSearchjobs
@@ -25,20 +29,18 @@ class connectorclass:
         file.close()
         
         return content 
-    
-class metadataSortmachine: 
-    
-    def groupByTitle(self,list):
-        for row in list: 
-            title = row.pop(2)
-            row.insert(0,title)
-        list = sorted(list)
-        return list
 
 def _plusifyQuery(query):
     return re.sub('\s+', '+', query)
 
 def performSearch(query, HTMLmachine):
+    """Search, sort data and print result
+    
+    Arguments
+    query -- search query
+    HTMLmachine -- html writer
+    
+    """
     connector = connectorclass()
     storage = []
     
@@ -51,8 +53,5 @@ def performSearch(query, HTMLmachine):
         hitnumbers = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl)
         HTMLmachine.outputResultsnumbers(hitnumbers, searchjob.location)
 
-#    sorter = metadataSortmachine()
-#    storage = sorter.groupByTitle(storage)
     storage = sorted(storage, cmp = lambda a, b : a.getFirst(b))
-#    sorted(storage, key = lambda item : item.title)
     HTMLmachine.output2dList(storage,"list")

@@ -22,7 +22,7 @@ import cgi
 import cgitb
 
 from html import HTMLwriter
-from search import performSearch, connectorclass
+from search import performSearch
         
 
 cgitb.enable()     
@@ -30,7 +30,6 @@ HTMLmachine = HTMLwriter()
 HTMLmachine.startBasicPage()
 HTMLmachine.outputSearchbox()
 storage = []
-connector = connectorclass()
 form = cgi.FieldStorage()
 
 if "search" in form:
