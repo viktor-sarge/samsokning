@@ -4,16 +4,27 @@ Created on 16 jan 2014
 
 @author: PC
 '''
+"""
+Parsers for different kinds of library systems. 
 
+"""
 import re
 
-def strip_tags(raw_html):
-    cleanr = re.compile('<.*?>')
-    cleantext = re.sub(cleanr,'', raw_html)
-    return cleantext
-
 class MediaItem:
+    """An item in a library"""
     def __init__(self, title, location, author, type, year, url):
+        """Initiate
+        
+        Arguments
+        title -- media title
+        location -- library location
+        author -- media author(s)
+        type -- media type
+        year -- year
+        url -- url
+
+        """
+
         self.title = title
         self.location = location
         self.author = author
@@ -22,6 +33,8 @@ class MediaItem:
         self.url = url
 
     def getLibrisQuery(self):
+        """Get a Libris search string for this MediaItem"""
+
         libris_query = ""
         continued_string = 0
         if self.author:
@@ -45,6 +58,13 @@ class MediaItem:
         return libris_query
 
     def getFirst(self, other):
+        """Compare two MediaItems and return a cmp-like result
+        
+        Argument
+        other -- MediaItem to compare this MediaItem to
+
+        """
+
         cmpres = cmp(self.title, other.title)
         
         if(0 == cmpres):
@@ -59,18 +79,37 @@ class MediaItem:
         return cmpres
 
 class LibraParser:
-    'Knows how to parse the different library opacs'
+    'Knows how to parse Libra'
+    def _strip_tags(raw_html):
+        """Return raw_html with tags removed
+        Argument
+        raw_html -- text to strip
+    
+        """
+        cleanr = re.compile('<.*?>')
+        cleantext = re.sub(cleanr,'', raw_html)
+        return cleantext
+
 
     def _extractTitleAndUrl(self, baseurl, urlAndTitle):
         searchfor = 'href="'
         replace = 'href="' + baseurl
         urlfield = urlAndTitle.replace(searchfor, replace)
         urlToOpac = urlfield[urlfield.find('href=')+6:urlfield.find('">')]
-        title = strip_tags(urlfield)
+        title = self._strip_tags(urlfield)
         
         return title, urlToOpac
 
     def parse(self,content,location,storage,baseurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+        
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+
+        """
         # Extract the relevant metadata using some string magic
         
         #First get the total number of hits through slicing the code
@@ -96,7 +135,7 @@ class LibraParser:
         while len(header_row) > 0:
             this_field = header_row[header_row.find('<th'):header_row.find('</th>')]
             header_row = header_row[header_row.find('</th>')+5:]
-            this_field = strip_tags(this_field)
+            this_field = self._strip_tags(this_field)
             headers_key[this_field] = ordercount
             ordercount = ordercount + 1         
             
@@ -135,7 +174,7 @@ class LibraParser:
                 url = ''
             if 'Medietyp' in headers_key:
                 medietyp = temprow[headers_key['Medietyp']]
-                medietyp = strip_tags(medietyp)
+                medietyp = self._strip_tags(medietyp)
 #                target_row.append(medietyp)
             else:
 #                target_row.append('')
@@ -171,6 +210,7 @@ def findDivs(text, elements):
     return text[divend + 5:]
 
 class ArenaParser:
+    """Parse search results from Arena"""
     def _appendToText(self, starttext, newtext):
         if('' == starttext):
             return newtext
@@ -185,6 +225,15 @@ class ArenaParser:
         return self._appendToText(origtext, text[start + 1:stop])
 
     def parse(self,content,location,storage,baseurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+        
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- unused
+
+        """
         kwindex = content.find(_kwarecord)
         content = content[kwindex:]
 
@@ -235,7 +284,20 @@ _kwmrecord = 'ctl00_PageContent_Control_hitlist1_RadGridHitList_ctl00__'
 _kwmurlregexp = 'ctl00_PageContent_Control_hitlist1_RadGridHitList_ctl00_ctl[0-9]+_lHyper'
 
 class MikromarcParser:
+    """Parse search results from Mikromarc"""
+    def _unspan(self, str):
+        return re.sub('</*a.*?>|</*span.*?>', '', str)
+
     def parse(self,content,location,storage,baseurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+        
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+
+        """
         hitcount = 0
         kwindex = content.find(_kwmrecord)
 
@@ -256,7 +318,7 @@ class MikromarcParser:
             for td in tds:
                 value = re.sub('</*td.*?>', '', td)
 
-                if((len(value) > 0) and unicode(value).isnumeric()):
+                if((len(value) > 0) and value.isdigit()):
                     year = value
                 elif(re.search(_kwmurlregexp, value) is not None):
                     urlmatch = re.findall('href\s*=\s*".*?"', value)
@@ -268,13 +330,13 @@ class MikromarcParser:
                     title = re.findall('<a.*?</a>', value)
 
                     if(len(title) > 0):
-                        title = re.sub('</*a.*?>|</*span.*?>', '', title[0])
+                        title = self._unspan(title[0])
 
                     data = re.split('<\s*br\s*/*\s*>', value)
 
                     if(len(data) > 2):
-                        author = data[1]
-                        type = data[2]
+                        author = self._unspan(data[1])
+                        type = self._unspan(data[2])
 
             storage.append(MediaItem(title, location, author, type, year, url))
             hitcount = hitcount + 1
@@ -282,60 +344,3 @@ class MikromarcParser:
             kwindex = content.find(_kwmrecord)
 
         return str(hitcount)
-
-_hugeText = u"""
- class="arena-record-details">
-                <img class="arena-media-class-icon" alt="Bok:Baskervilles hund:1984" id="id__searchResult__WAR__arenaportlets____14" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/org.apache.wicket.Application/book" title="Bok:Baskervilles hund:1984"/>    <div class="arena-record-title">
-                    <a href="http://bibliotek.mark.se/web/arena/results?p_p_state=normal&amp;p_p_lifecycle=1&amp;p_p_action=1&amp;p_p_id=crDetailWicket_WAR_arenaportlets&amp;p_p_col_count=4&amp;p_p_col_id=column-2&amp;p_p_mode=view&amp;back_url=http%3A%2F%2Fbibliotek.mark.se%2Fweb%2Farena%2Fsearch%3Bjsessionid%3DC28087E01863D0D5DC93FD595721207E%3Fp_p_id%3DsearchResult_WAR_arenaportlets%26p_p_lifecycle%3D1%26p_p_state%3Dnormal%26p_p_mode%3Dview%26p_p_col_id%3Dcolumn-2%26p_p_col_count%3D4%26facet_queries%3D%26search_item_no%3D0%26sort_advice%3Dfield%253DRelevance%2526direction%253DDescending%26arena_member_id%3D187406501%26agency_name%3DASE514631%26search_type%3Dsolr%26search_query%3DBaskervilles%2Bhund&amp;facet_queries=&amp;search_item_no=0&amp;sort_advice=field%3DRelevance%26direction%3DDescending&amp;search_type=solr&amp;search_query=Baskervilles+hund&amp;arena_member_id=187406501&amp;search_item_id=73447&amp;agency_name=ASE514631" target="_self"><span>Baskervilles hund</span></a>
-                </div><div class="arena-record-author">
-                    <span class="arena-field">Av:</span>
-                    <span class="arena-value">Doyle, Arthur Conan</span>
-                </div><div class="arena-record-year">
-                    <span class="arena-field">Utgivnings�r:</span>
-                    <span class="arena-value">1984</span>
-                </div><div class="arena-record-media">
-                    <span class="arena-field">Medietyp:</span>
-                    <span class="arena-value">Bok</span>
-                </div><div class="arena-record-rating">
-                <div class="arena-record-year">
-                    <span class="arena-field">Utgivnings�r:</span>
-                    <span class="arena-value">1984</span>
-                </div>
-            <img alt="Markerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-yellow.png"/>
-            <img alt="Markerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-yellow.png"/>
-            <img alt="Markerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-yellow.png"/>
-            <img alt="Markerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-yellow.png"/>
-            <img alt="Omarkerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-silver.png"/>
-            <img alt="Omarkerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-silver.png"/>
-            <img alt="Omarkerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-silver.png"/>
-            <img alt="Omarkerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-silver.png"/>
-            <img alt="Omarkerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-silver.png"/>
-            <img alt="Omarkerad betygsstj&auml;rna" src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/com.axiell.arena.wicket.components.panels.ratingdecor.RatingDecorPanel/star-silver.png"/>
-            <div>
-                
-                
-            </div></div><div class="arena-record-tags">
-</div></div><div class="arena-record-right">
-                <div class="arena-record-availability">
-                    <span><em></em></span>
-                </div></div><div class="arena-record-button">
-                <a id="id__searchResult__WAR__arenaportlets____15" style="display:none"></a>
-                <span>    <a class="arena-link-button arena-add-basket" id="id__searchResult__WAR__arenaportlets____16" href="http://bibliotek.mark.se/web/arena/search;jsessionid=C28087E01863D0D5DC93FD595721207E?p_p_id=searchResult_WAR_arenaportlets&amp;p_p_lifecycle=1&amp;p_p_state=normal&amp;p_p_mode=view&amp;p_p_col_id=column-2&amp;p_p_col_count=4&amp;_searchResult_WAR_arenaportlets__wu=%2FsearchResult%2F%3Fwicket%3Ainterface%3D%3A0%3AsearchResultPanel%3AdataContainer%3AdataView%3A1%3AcontainerItem%3Aitem%3AindexedRecordPanel%3AaddToMyMediaListPanel%3AaddToMyMediaLink%3A%3AILinkListener%3A%3A" onclick="if (function(){return Wicket.$('id__searchResult__WAR__arenaportlets____16') != null;}.bind(this)()) { Wicket.showIncrementally('id__searchResult__WAR__arenaportlets____16--ajax-indicator');}var wcall=wicketAjaxGet('http://bibliotek.mark.se/web/arena/search;jsessionid=C28087E01863D0D5DC93FD595721207E?p_p_id=searchResult_WAR_arenaportlets&amp;p_p_lifecycle=2&amp;p_p_state=normal&amp;p_p_mode=view&amp;p_p_resource_id=%2FsearchResult%2F%3Fwicket%3Ainterface%3D%3A0%3AsearchResultPanel%3AdataContainer%3AdataView%3A1%3AcontainerItem%3Aitem%3AindexedRecordPanel%3AaddToMyMediaListPanel%3AaddToMyMediaLink%3A%3AIBehaviorListener%3A0%3A&amp;p_p_cacheability=cacheLevelPage&amp;p_p_col_id=column-2&amp;p_p_col_count=4',function() { ;Wicket.hideIncrementally('id__searchResult__WAR__arenaportlets____16--ajax-indicator');}.bind(this),function() { ;Wicket.hideIncrementally('id__searchResult__WAR__arenaportlets____16--ajax-indicator');}.bind(this), function() {return Wicket.$('id__searchResult__WAR__arenaportlets____16') != null;}.bind(this));return !wcall;">    <span>Lägg i minneslista</span>    </a><span style="display:none;" class="wicket-ajax-indicator" id="id__searchResult__WAR__arenaportlets____16--ajax-indicator"><img src="/arena-portlets/searchResult/ps:searchResult_WAR_arenaportlets_LAYOUT_16308/resources/org.apache.wicket.ajax.AbstractDefaultAjaxBehavior/indicator.gif" alt=""/></span>
-        </span>
-                <!-- AR-426 <span wicket:id="addToMyCollectionPanel"></span> -->
-                <span>
-            <a class="arena-link-button" href="http://bibliotek.mark.se/web/arena/search;jsessionid=C28087E01863D0D5DC93FD595721207E?p_p_id=searchResult_WAR_arenaportlets&amp;p_p_lifecycle=1&amp;p_p_state=normal&amp;p_p_mode=view&amp;p_p_col_id=column-2&amp;p_p_col_count=4&amp;_searchResult_WAR_arenaportlets__wu=%2FsearchResult%2F%3Fwicket%3Ainterface%3D%3A0%3AsearchResultPanel%3AdataContainer%3AdataView%3A1%3AcontainerItem%3Aitem%3AindexedRecordPanel%3ArecommendThisPanel%3ArecommendThisLink%3A%3AILinkListener%3A%3A"><span>Tipsa</span></a>
-        </span>
-            </div><div class="arena-review">
-</div></div><div>"""
-
-if __name__ == "__main__":
-    list = []
-    theRest = findDivs(_hugeText, list)
-
-    for l in list:
-        print(l)
-        print('********************************************')
-
-    print('           ********************************************')
-    print(theRest)
