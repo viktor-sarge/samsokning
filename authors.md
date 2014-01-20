@@ -1,2 +1,2 @@
 Authors: 
-Samsök was built by Viktor Sarge for Kultur i Halland - Regionbibliotek.
+Samsök was built by Viktor Sarge for Kultur i Halland - Regionbibliotek and Mattias Persson. 
