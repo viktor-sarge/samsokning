@@ -4,6 +4,12 @@ Created on 17 jan 2014
 
 @author: PC
 '''
+"""
+Specify search configurations. 
+
+Modify this file to add or remove searchable libraries. 
+
+"""
 
 import re
 from opacparser import LibraParser, ArenaParser, MikromarcParser
@@ -11,6 +17,16 @@ from opacparser import LibraParser, ArenaParser, MikromarcParser
 QueryRegex = '@QUERY@'
 
 class SearchJob:
+    """Data required to perform a search at a library
+    
+    Arguments
+    parser -- an object containing a method parse; see examples in opacparser.py
+    baseurl -- base url to media content; set to '' if not used by the parser
+    searchurl -- url used for searching; replace search query with @QUERY@ unless it appears at the end
+    location -- library location (name)
+    query -- the query to search for; any space should be replaced by a +
+
+    """
     def __init__(self, parser, baseurl, searchurl, location, query):
         self.parser = parser
         self.baseurl = baseurl
@@ -112,6 +128,15 @@ def getAll(query):
     return getLibra(query) + getMikromarc(query) + getArena(query)
 
 def getSearchjobs(query):
+    """Return search jobs
+    
+    Call any (combination of) the above functions to specify which libraries to search
+
+    Argument
+    query -- the query to search for; any space should be replaced by a +
+
+    """
     return getAll(query)
+#    return getBollebygd(query)
 #    return getAssortment(query)
 #    return getMark(query)
