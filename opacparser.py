@@ -80,7 +80,7 @@ class MediaItem:
 
 class LibraParser:
     'Knows how to parse Libra'
-    def _strip_tags(raw_html):
+    def _strip_tags(self, raw_html):
         """Return raw_html with tags removed
         Argument
         raw_html -- text to strip
