@@ -386,7 +386,16 @@ class MikromarcParser:
 
                     if(len(data) > 2):
                         author = self._unspan(data[1])
-                        type = self._unspan(data[2])
+                else:
+                    if(value.find('<img') >= 0):
+                        imgs = re.findall('<img.*?/>', value)
+
+                        if(len(imgs) > 0):
+                            imgs = re.findall('alt\s*=\s*".*?"', imgs[0])
+
+                            if(len(imgs) > 0):
+                                img = re.sub('alt\s*=\s*"', '', imgs[0])
+                                type = img[:-1]
 
             storage.append(MediaItem(title, location, author, type, year, url))
             hitcount = hitcount + 1
