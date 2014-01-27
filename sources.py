@@ -138,8 +138,8 @@ def getSearchjobs(query):
     """
 #    return getMikromarc(query)
 #    return getArena(query)
-    return getLibra(query)
-#    return getAll(query)
+#    return getLibra(query)
+    return getAll(query)
 #    return getBollebygd(query)
 #    return getAssortment(query)
 #    return getMark(query)
