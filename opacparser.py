@@ -78,6 +78,15 @@ class MediaItem:
 
         return cmpres
 
+_kwlsingle = 'Tillbaka till resultatlista'
+_kwlsinglestart = 'listline2'
+_kwlsingleend = '/table'
+_kwlauthor = 'Författare:'
+_kwltitle = 'Titel:'
+_kwlyear = 'Förlag/år:'
+_kwlurlstart = '<table'
+_kwlurlend = 'Utförlig kataloginfo'
+
 class LibraParser:
     'Knows how to parse Libra'
     def _strip_tags(self, raw_html):
@@ -100,26 +109,7 @@ class LibraParser:
         
         return title, urlToOpac
 
-    def parse(self,content,location,storage,baseurl):
-        """Parse content, add any contained items to storage and return number of items found as a string
-        
-        Arguments
-        content -- (html-)content to parse
-        location -- library location
-        storage -- list to which MediaItems will be added as they are found in content
-        baseurl -- base url to media content
-
-        """
-        # Extract the relevant metadata using some string magic
-        
-        #First get the total number of hits through slicing the code
-        hitnumbers = content[content.find("<b>Resultat"):]
-        hitnumbers = hitnumbers[:hitnumbers.find("</b>")]
-        hitnumbers = hitnumbers[hitnumbers.find("av")+3:]
-        #hitnumbers = hitnumbers.strip()
-        #hitnumbers = int(hitnumbers)
-        #print "Hitnumbers eftr slicing inuti parseLibra" + hitnumbers
-        
+    def _parseMultiple(self,content,location,storage,baseurl, hitnumbers):
         #Second - take apart the results list and put the parts into the storage
         
         # Slicing away the html surrounding the list with the info we want
@@ -155,43 +145,103 @@ class LibraParser:
                 
             # Ordering the temprow to a standardised form with the use of headers_key
             # Adding city to target row (also corrects the index numbers s
-#            target_row = [temprow.pop(0)]
             location = temprow.pop(0)
             
             if 'F\xc3\xb6rfattare' in headers_key:
-#                target_row.append(temprow[headers_key['F\xc3\xb6rfattare']])
                 author = temprow[headers_key['F\xc3\xb6rfattare']]
             else:
-#                target_row.append('')
                 author = ''
             if 'Titel' in headers_key:
-#                target_row.append(temprow[headers_key['Titel']])
                 urlAndTitle = temprow[headers_key['Titel']]
                 title, url = self._extractTitleAndUrl(baseurl, urlAndTitle)
             else:
-#                target_row.append('')
                 title = ''
                 url = ''
             if 'Medietyp' in headers_key:
                 medietyp = temprow[headers_key['Medietyp']]
                 medietyp = self._strip_tags(medietyp)
-#                target_row.append(medietyp)
             else:
-#                target_row.append('')
                 medietyp = ''
             if '\xc3\x85r' in headers_key:
-#                target_row.append(temprow[headers_key['\xc3\x85r']])
                 year = temprow[headers_key['\xc3\x85r']]
             else:
-#                target_row.append('')
                 year = ''
-    
+
             item = MediaItem(title, location, author, medietyp, year, url)
-#            storage.append(target_row)
             storage.append(item)
             hitlist = hitlist[hitlist.find('</tr>')+5:]
 
         return hitnumbers
+
+    def _parseOne(self,content,location,storage,baseurl, hitnumbers):
+            start = content.find(_kwlsinglestart)
+            content = content[start:]
+            stop = content.find(_kwlsingleend)
+            data = content[:stop]
+            urldata = content[stop + 2:]
+            start = urldata.find(_kwlurlstart)
+            stop = urldata.find(_kwlurlend)
+            urldata = content[start:stop]
+            title = ''
+            author = ''
+            year = ''
+
+            trs = re.findall('<tr.*?</tr>', data)
+
+            for tr in trs:
+                tds = re.findall('<td.*?</td>', tr)
+
+                if(len(tds) > 1):
+                    if(tds[0].find(_kwlauthor) >= 0):
+                        author = re.sub('</*.*?>', '', tds[1])
+                    elif(tds[0].find(_kwltitle) >= 0):
+                        title = re.sub('</*.*?>', '', tds[1])
+                    elif(tds[0].find(_kwlyear) >= 0):
+                        year = re.sub('</*.*?>', '', tds[1])
+                        years = re.findall('[0-9]{4}', year)
+                        
+                        if(len(years) > 0):
+                            year = years[0]
+                        else:
+                            year = ''
+
+            urls = re.findall('<a.*?>', urldata)
+            
+            if(len(urls) > 0):
+                url = re.sub('<a.*?"', '', urls[0])
+                url = 'href="' + baseurl + re.sub('">', '', url)
+            else:
+                url = ''
+
+            item = MediaItem(title, location, author, '', year, url)
+            storage.append(item)
+
+            return hitnumbers
+
+    def parse(self,content,location,storage,baseurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+        
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+
+        """
+        # Extract the relevant metadata using some string magic
+        
+        #First get the total number of hits through slicing the code
+        hitnumbers = content[content.find("<b>Resultat"):]
+        hitnumbers = hitnumbers[:hitnumbers.find("</b>")]
+        hitnumbers = hitnumbers[hitnumbers.find("av")+3:]
+        #hitnumbers = hitnumbers.strip()
+        #hitnumbers = int(hitnumbers)
+        #print "Hitnumbers eftr slicing inuti parseLibra" + hitnumbers
+        
+        if(content.find(_kwlsingle) >= 0):
+            return self._parseOne(content,location,storage,baseurl, hitnumbers)
+        else:
+            return self._parseMultiple(content,location,storage,baseurl, hitnumbers)
 
 _kwarecord = 'arena-record-details'
 
