@@ -16,7 +16,10 @@ from search import performSearch
 def main():
     writer = HTMLwriter()
     writer.startBasicPage()
-    performSearch('Herman Melville', writer)
+#    performSearch('Ljuden från kosmos', writer)
+#    performSearch('Herman Melville', writer)
+#    performSearch('mozart', writer)
+    performSearch('Baskervilles hund', writer)
 #    performSearch('gris', writer)
     writer.closeBasicPage()
 

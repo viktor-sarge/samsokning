@@ -76,7 +76,7 @@ def getMikromarc(query):
                            'http://webbsok.mikromarc.se/Mikromarc3/web/search.aspx?Unit=6471&db=bollebygd-fb&SC=FT&SW=@QUERY@&LB=FT&IN=&SU=19116&', 
                            'Bollebygd', query))
 
-    result.append(SearchJob(mmp, 'http://webbsok.mikromarc.se/Mikromarc3/web/', 
+    result.append(SearchJob(mmp, '',  
                            'http://webbsok.mikromarc.se/Mikromarc3/Web/search.aspx?Unit=6469&db=vargarda&SC=FT&SW=@QUERY@&LB=FT&IN=&SU=0&', 
                            'Vårgårda', query))
 
@@ -97,6 +97,10 @@ def getArena(query):
                            'http://biblioteken.vara.se/web/pub/search?p_p_state=normal&p_p_lifecycle=1&p_p_action=1&p_p_id=searchResult_WAR_arenaportlets&p_p_col_count=3&p_p_col_id=column-1&p_p_col_pos=1&p_p_mode=view&facet_queries=&search_item_no=0&search_type=solr&search_query=', 
                            'Vara', query))
 
+    result.append(SearchJob(ap, '', 
+                           'http://bibliotek.halmstad.se/web/arena/search?p_p_state=normal&p_p_lifecycle=1&p_p_action=1&p_p_id=searchResult_WAR_arenaportlets&p_p_col_count=11&p_p_col_id=column-1&p_p_mode=view&search_item_no=0&search_type=solr&search_query=', 
+                           'Halmstad', query))
+
     return result
 
 def getLibra(query):
@@ -105,10 +109,6 @@ def getLibra(query):
     result.append(SearchJob(lp, 'http://opac.laholm.axiell.com/opac/', 
                            'http://opac.laholm.axiell.com/opac/search_result.aspx?TextFritext=', 
                            'Laholm', query))
-
-    result.append(SearchJob(lp, 'http://halmstadopac.kultur.halmstad.se/opac/', 
-                           'http://halmstadopac.kultur.halmstad.se/opac/search_result.aspx?TextFritext=', 
-                           'Halmstad', query))
 
     result.append(SearchJob(lp, 'http://www5.falkenberg.se/opac/opac/', 
                            'http://www5.falkenberg.se/opac/opac/search_result.aspx?TextFritext=', 
@@ -136,6 +136,9 @@ def getSearchjobs(query):
     query -- the query to search for; any space should be replaced by a +
 
     """
+#    return getMikromarc(query)
+#    return getArena(query)
+#    return getLibra(query)
     return getAll(query)
 #    return getBollebygd(query)
 #    return getAssortment(query)
