@@ -50,7 +50,7 @@ def performSearch(query, HTMLmachine):
 
     for searchjob in searchjobs:
         page = connector.getpage(searchjob.searchurl)
-        hitnumbers = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl)
+        hitnumbers = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl, searchjob.searchurl)
         HTMLmachine.outputResultsnumbers(hitnumbers, searchjob.location)
 
     storage = sorted(storage, cmp = lambda a, b : a.getFirst(b))

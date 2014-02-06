@@ -173,7 +173,7 @@ class LibraParser:
 
         return hitnumbers
 
-    def _parseOne(self,content,location,storage,baseurl, hitnumbers):
+    def _parseOne(self,content,location,storage,baseurl, hitnumbers, searchurl):
             start = content.find(_kwlsinglestart)
             content = content[start:]
             stop = content.find(_kwlsingleend)
@@ -205,20 +205,21 @@ class LibraParser:
                         else:
                             year = ''
 
-            urls = re.findall('<a.*?>', urldata)
-            
-            if(len(urls) > 0):
-                url = re.sub('<a.*?"', '', urls[0])
-                url = 'href="' + baseurl + re.sub('">', '', url)
-            else:
-                url = ''
+#This url goes to a search for the author
+#            urls = re.findall('<a.*?>', urldata)
+#            
+#            if(len(urls) > 0):
+#                url = re.sub('<a.*?"', '', urls[0])
+#                url = baseurl + re.sub('">', '', url)
+#            else:
+#                url = ''
 
-            item = MediaItem(title, location, author, '', year, url)
+            item = MediaItem(title, location, author, '', year, searchurl)
             storage.append(item)
 
             return hitnumbers
 
-    def parse(self,content,location,storage,baseurl):
+    def parse(self,content,location,storage,baseurl, searchurl):
         """Parse content, add any contained items to storage and return number of items found as a string
         
         Arguments
@@ -226,6 +227,7 @@ class LibraParser:
         location -- library location
         storage -- list to which MediaItems will be added as they are found in content
         baseurl -- base url to media content
+        searchurl -- search url
 
         """
         # Extract the relevant metadata using some string magic
@@ -239,7 +241,7 @@ class LibraParser:
         #print "Hitnumbers eftr slicing inuti parseLibra" + hitnumbers
         
         if(content.find(_kwlsingle) >= 0):
-            return self._parseOne(content,location,storage,baseurl, hitnumbers)
+            return self._parseOne(content,location,storage,baseurl, hitnumbers, searchurl)
         else:
             return self._parseMultiple(content,location,storage,baseurl, hitnumbers)
 
@@ -274,7 +276,7 @@ class ArenaParser:
         stop = text.find('</span>')
         return self._appendToText(origtext, text[start + 1:stop])
 
-    def parse(self,content,location,storage,baseurl):
+    def parse(self,content,location,storage,baseurl, searchurl):
         """Parse content, add any contained items to storage and return number of items found as a string
         
         Arguments
@@ -282,6 +284,7 @@ class ArenaParser:
         location -- library location
         storage -- list to which MediaItems will be added as they are found in content
         baseurl -- unused
+        searchurl -- search url
 
         """
         kwindex = content.find(_kwarecord)
@@ -338,7 +341,7 @@ class MikromarcParser:
     def _unspan(self, str):
         return re.sub('</*a.*?>|</*span.*?>', '', str)
 
-    def parse(self,content,location,storage,baseurl):
+    def parse(self,content,location,storage,baseurl, searchurl):
         """Parse content, add any contained items to storage and return number of items found as a string
         
         Arguments
@@ -346,6 +349,7 @@ class MikromarcParser:
         location -- library location
         storage -- list to which MediaItems will be added as they are found in content
         baseurl -- base url to media content
+        searchurl -- search url
 
         """
         hitcount = 0
