@@ -4,6 +4,8 @@ Created on 17 jan 2014
 
 @author: PC
 '''
+import config
+
 """
 Specify search configurations. 
 
@@ -12,7 +14,7 @@ Modify this file to add or remove searchable libraries.
 """
 
 import re
-from opacparser import LibraParser, ArenaParser, MikromarcParser
+from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser
 
 QueryRegex = '@QUERY@'
 
@@ -124,8 +126,18 @@ def getLibra(query):
 
     return result
 
+def getGotlib(query):
+    return [SearchJob(GotlibParser(), 'http://encore.gotlib.goteborg.se/',
+                           'http://encore.gotlib.goteborg.se/iii/encore/search/C__S@QUERY@__Orightresult__U1?lang=swe&suite=pearl',
+                           'Göteborg', query)]
+
+def getMalmo(query):
+    return [SearchJob(MalmoParser(), 'http://malmo.stadsbibliotek.org/',
+                           'http://malmo.stadsbibliotek.org/search~S7*swe/?SUBMIT=Sök+%3E%3E%searchtype=X&searcharg=',
+                           'Malmö', query)]
+
 def getAll(query):
-    return getLibra(query) + getMikromarc(query) + getArena(query)
+    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query)
 
 def getSearchjobs(query):
     """Return search jobs
@@ -136,10 +148,10 @@ def getSearchjobs(query):
     query -- the query to search for; any space should be replaced by a +
 
     """
-#    return getMikromarc(query)
-#    return getArena(query)
-#    return getLibra(query)
-    return getAll(query)
-#    return getBollebygd(query)
-#    return getAssortment(query)
-#    return getMark(query)
+    sources = getAll(query)
+    configured = config.parser.get(config.defaultSection, 'searchSources')
+    if configured == '*':
+        return sources
+
+    configured = [x.strip() for x in configured.split(',')]
+    return filter(lambda x: x.location in configured, sources)

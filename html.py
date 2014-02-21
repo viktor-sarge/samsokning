@@ -1,8 +1,16 @@
+# -*- coding: utf-8 -*-
+
 '''
 Created on 16 jan 2014
 
 @author: PC
 '''
+
+import config
+import sources
+from sourceselector import sourceselector
+import cgi
+
 """
 Print html page.
 
@@ -16,6 +24,7 @@ class HTMLwriter:
     def startBasicPage(self):
         """Print the start of the page"""
         print 'Content-type: text/html'
+        print sourceselector.getCookie().output()
         print
         print '<!DOCTYPE html>'
         print '<html>'
@@ -29,13 +38,16 @@ class HTMLwriter:
         print '</head>'
         print '<body>'
         print '<div data-role="page">'
-        print '<div data-role="panel" id="infopanel">'
+        print '<div data-role="panel" id="sourcespanel">'
+        self._outputSourcesForm()
+        print '</div><!-- /panel -->'
+        print '<div data-role="panel" data-position="right" id="infopanel">'
         print '<p>Sams&ouml;k Halland &auml;r en tj&auml;nst fr&aring;n <a href="http://www.regionhalland.se/regionbibliotek">Kultur i Halland - Regionbibliotek</a> t&auml;nkt att fungera som ers&auml;ttare f&ouml;r Bibliotek24 i fj&auml;rrl&aring;earbetet.</p>'
         print '<p>Tj&auml;nsten &auml;r under uppbyggnad och synpunkter mottages tacksamt till viktor [punkt] sarge [snabela] regionhalland [punkt] se</p>'
         print '<p>K&auml;llkoden finns p&aring; <a href="http://github.com/regionbibliotekhalland/samsokning">regionbibliotekets Github-konto</a></p>'
         print '</div><!-- /panel -->'
         print '<div data-role="header">'
-        print '<a href="#infopanel">Info</a><h1>Sams&ouml;k Halland</h1>'
+        print '<a href="#sourcespanel">V&auml;lj kataloger</a><h1>Sams&ouml;k Halland</h1><a href="#infopanel">Info</a>'
         print '</div>'
         print '<div data-role="content">'
     
@@ -53,7 +65,7 @@ class HTMLwriter:
         print '<input type="submit" value="S&ouml;k" data-role="button" data-inline="true">'
         print '</form>'
 
-    def outputResultsnumbers(self,numbers, location):
+    def outputResultsnumbers(self,numbers, location, timeElapsed = None):
         """Print the number of hits at a library
         
         Arguments
@@ -63,9 +75,36 @@ class HTMLwriter:
         """
 
         if numbers:
-            print 'Din s&ouml;kning gav ' + numbers + ' tr&auml;ffar i ' + location + '<br>\n'
+            print 'Din s&ouml;kning gav ' + numbers + ' tr&auml;ffar i ' + location,
         else: 
-            print 'Din s&ouml;kning gav 0 tr&auml;ffar i ' + location + '<br>\n'
+            print 'Din s&ouml;kning gav 0 tr&auml;ffar i ' + location,
+
+        if config.parser.getboolean(config.defaultSection, 'showTimeElapsed') and timeElapsed:
+            print '(p&aring; %.1f sek)' % timeElapsed,
+
+        print '<br>\n'
+
+    def outputError(self, location):
+        """Prints an error message for a library.
+
+        Arguments
+        location -- library
+        """
+        print 'S&ouml;kningen hos ' + location + ' misslyckades.<br>\n'
+
+    def _outputSourcesForm(self):
+        print '<form method="POST">'
+        jobs = sources.getSearchjobs('fakequery')
+        for job in jobs:
+            print '<input type="checkbox" name="source" id="%s" value="%s" %s />' % (job.location, job.location, 'checked="checked"' if sourceselector.isSourceSelected(job.location) else '')
+            print '<label for="%s">%s</label>' % (job.location, job.location)
+
+        print '<input type="submit" value="Spara" />'
+        print '</form>'
+        if len(sourceselector.getSelectedSources()) > 0:
+            print '<form method="POST">'
+            print '<input type="submit" name="clearsources" value="&Aring;terst&auml;ll urval" />'
+            print '</form>'
 
     def _tdPrint(self, str):
         print '<td>'

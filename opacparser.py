@@ -4,11 +4,15 @@ Created on 16 jan 2014
 
 @author: PC
 '''
+
 """
 Parsers for different kinds of library systems. 
 
 """
 import re
+from lxml import etree
+from StringIO import StringIO
+import urlparse
 
 class MediaItem:
     """An item in a library"""
@@ -407,3 +411,84 @@ class MikromarcParser:
             kwindex = content.find(_kwmrecord)
 
         return str(hitcount)
+
+class BaseXmlParser:
+    encoding = 'utf-8'
+
+    def _getInnerText(self, element):
+        s = ''.join([x.strip() for x in element.itertext(etree.Element)])
+        if isinstance(s, unicode):
+            s = s.encode(self.encoding)
+        return s
+
+class GotlibParser(BaseXmlParser):
+
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO(content), parser)
+        results = tree.xpath("//table[@class='browseResult']/tr")
+        for result in results:
+            title = self._getInnerText(result.xpath(".//div[@class='dpBibTitle']")[0])
+            author = self._getInnerText(result.xpath(".//div[@class='dpBibAuthor']")[0])
+            type = self._getInnerText(result.xpath(".//span[@class='itemMediaDescription']")[0])
+            year = self._getInnerText(result.xpath(".//span[@class='itemMediaYear']")[0])
+            url = urlparse.urljoin(baseurl, result.xpath(".//div[@class='dpBibTitle']/a/@href")[0])
+            storage.append(MediaItem(title, location, author, type, year, url))
+
+        return str(len(results))
+
+class MalmoParser(BaseXmlParser):
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+        self.encoding = 'latin-1'
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO(content), parser)
+        results = tree.xpath("//tr[@class='briefCitRow']")
+        hits = []
+        for result in results:
+            titletags = result.xpath(".//span[@class='briefcitTitle']/../a")
+            if len(titletags) == 0:
+                continue
+            title = self._getInnerText(titletags[0])
+            author = self._getInnerText(result.xpath(".//span[@class='briefcitTitle']")[0])
+            type = result.xpath(".//span[@class='briefcitMedia']/img[1]/@alt")[0]
+            year = self._getInnerText(result.xpath(".//table/tr/td[5]")[0])
+            url = urlparse.urljoin(baseurl, result.xpath(".//span[@class='briefcitStatus']/a/@href")[0])
+            hits.append(MediaItem(title, location, author, type, year, url))
+
+        # Special case for only one hit
+        if len(results) == 0:
+            results = tree.xpath("//tr[@class='bibInfoEntry']")
+            if len(results) > 0:
+                result = results[0]
+                title = self._getInnerText(result.xpath(".//td[@class='bibInfoLabel' and text() = 'Titel']/../td[@class='bibInfoData']")[0])
+                author = self._getInnerText(result.xpath(".//td[@class='bibInfoLabel' and text() = 'Namn']/../td[@class='bibInfoData']")[0])
+                type = result.xpath("//td[@class='media']/img[1]/@alt")[0]
+                year = self._getInnerText(result.xpath(".//td[@class='bibInfoLabel' and text() = 'Utgivning']/../td[@class='bibInfoData']")[0])
+                year = year[-4:]
+                if not year.isdigit():
+                    year = ""
+                url = searchurl
+                hits.append(MediaItem(title, location, author, type, year, url))
+
+        storage.extend(hits)
+        return str(len(hits))
