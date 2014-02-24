@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 Created on 16 jan 2014
 
@@ -10,17 +12,19 @@ Perform search.
 import re
 from html import HTMLwriter
 from sources import getSearchjobs
-
+import socket
+from multiprocessing import Pool
+import urllib2
+import urllib
+import time
+import config
+from sourceselector import sourceselector
 
 class connectorclass: 
     'Knows how to fetch the different library opacs'
     
-    def __init__(self):
-        import urllib
-        
     def getpage(self, url):
-        import urllib
-        page = urllib.urlopen(url)
+        page = urllib2.urlopen(url, timeout = config.parser.getfloat(config.defaultSection, 'connectorTimeoutSeconds'))
         content = page.read()
         page.close()
         
@@ -31,7 +35,22 @@ class connectorclass:
         return content 
 
 def _plusifyQuery(query):
-    return re.sub('\s+', '+', query)
+    return urllib.quote(query)
+
+def _executeSearchJob(searchjob):
+    startTime = time.time()
+
+    connector = connectorclass()
+    storage = []
+
+    hitnumbers = None
+    try:
+        page = connector.getpage(searchjob.searchurl)
+        hitnumbers = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl, searchjob.searchurl)
+    except:
+        pass
+
+    return (searchjob.location, hitnumbers, storage, time.time() - startTime)
 
 def performSearch(query, HTMLmachine):
     """Search, sort data and print result
@@ -41,17 +60,22 @@ def performSearch(query, HTMLmachine):
     HTMLmachine -- html writer
     
     """
-    connector = connectorclass()
-    storage = []
-    
     HTMLmachine.outputHitCountHeader(query)
 
-    searchjobs = getSearchjobs(_plusifyQuery(query))
+    searchjobs = [job for job in getSearchjobs(_plusifyQuery(query)) if sourceselector.isSourceSelected(job.location)]
 
-    for searchjob in searchjobs:
-        page = connector.getpage(searchjob.searchurl)
-        hitnumbers = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl, searchjob.searchurl)
-        HTMLmachine.outputResultsnumbers(hitnumbers, searchjob.location)
+    storage = []
+
+    p = Pool(len(searchjobs))
+    results = p.map(_executeSearchJob, searchjobs)
+
+    for result in results:
+        if (result[1]):
+            HTMLmachine.outputResultsnumbers(result[1], result[0], result[3])
+            storage.extend(result[2])
+        else:
+            HTMLmachine.outputError(result[0])
+
 
     storage = sorted(storage, cmp = lambda a, b : a.getFirst(b))
     HTMLmachine.output2dList(storage,"list")

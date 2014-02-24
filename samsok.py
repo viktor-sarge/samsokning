@@ -18,21 +18,29 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-import cgi  
+import cgi
 import cgitb
+cgitb.enable()
+
+# First off, modify the path to allow any locally installed packages
+import config
+import sys
+import os
+import json
+for folder in json.loads(config.parser.get(config.defaultSection, 'localLibFolders')):
+    sys.path.append(os.path.abspath(folder))
 
 from html import HTMLwriter
 from search import performSearch
-        
 
-cgitb.enable()     
-HTMLmachine = HTMLwriter()
-HTMLmachine.startBasicPage()
-HTMLmachine.outputSearchbox()
-storage = []
-form = cgi.FieldStorage()
+if __name__ == '__main__':
+    HTMLmachine = HTMLwriter()
+    HTMLmachine.startBasicPage()
+    HTMLmachine.outputSearchbox()
+    storage = []
+    form = cgi.FieldStorage()
 
-if "search" in form:
-    performSearch(form['search'].value, HTMLmachine)
+    if "search" in form:
+        performSearch(form['search'].value, HTMLmachine)
 
-HTMLmachine.closeBasicPage()
+    HTMLmachine.closeBasicPage()
