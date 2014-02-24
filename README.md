@@ -13,11 +13,7 @@ Installation:
 * Ställ filrättighetern (högerklicka och välj "Filrättigheter" i Filezilla) till värdet 755. 
 * Navigera till den adress du gett skriptet och testa det. 
 * Om du döper om skriptet till något annat än "samsok.py" behöver du också ändra sökvägen i koden som skapar "Submit"-knappen. 
-
-Samsöka egna bibliotek:
-Programmet är ganska enkelt att modifiera om man är en liten aning van vid att läsa kod.
-För närvarande krävs att man manuellt ändrar de URLer som är angivna. Notera att man i skrivande stund endast kan söka i Libra.se-kataloger.
-En förhoppning är att kunna bygga kopplingar även till övriga system som är vanliga på den svenska marknaden. 
+* Skriptet behöver biblioteket lxml (se lxml.de) installerat för att fungera. (Mer om detta kommer).  
 
 Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av. Programmet är fri mjukvara och licensierat under version 3 av GPL-licensen.
 
