@@ -13,7 +13,7 @@ Installation:
 * Ställ filrättighetern (högerklicka och välj "Filrättigheter" i Filezilla) till värdet 755. 
 * Navigera till den adress du gett skriptet och testa det. 
 * Om du döper om skriptet till något annat än "samsok.py" behöver du också ändra sökvägen i koden som skapar "Submit"-knappen. 
-* Skriptet behöver biblioteket lxml (se lxml.de) installerat för att fungera. (Mer om detta kommer).  
+* Skriptet behöver biblioteket lxml (se lxml.de) installerat för att fungera. (Mer om detta kommer). Kontrollera att sökvägen i config-filen till lxml är korrekt. Den som finns i skriptet idag är inställd för vår användning på Loopia. 
 
 Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av. Programmet är fri mjukvara och licensierat under version 3 av GPL-licensen.
 
