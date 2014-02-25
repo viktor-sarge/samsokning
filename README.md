@@ -5,7 +5,8 @@ Beskrivning:
 En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. 
 Denna första version är tänkt som en demo av funktionaliteten och skall inte ses som skarp kod. Programmet erbjuder en enkel samsökningstjänst. 
 
-Installation: 
+Installation:  
+
 1) Spara skriptet på din egen dator genom t.ex. funktionen "Save as Zip" bland knapparna i högerkanten på Github. 
 
 2) Redigera eventuellt samsok.py och lägg till egna bibliotek i sources.py. Det finns connectorklasser för Libra.se, Arena (inklusive den nya opacen i Book-IT 7.1), Mikromarc och Millennium i Göteborg/Malmö. De flesta kommuners kataloger bör fungera utan problem men det kan uppstå fel pga avvikelser i hur enskilda installationer är konfigurerade. 
