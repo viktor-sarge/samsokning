@@ -11,15 +11,13 @@ Installation:
 
 2) Redigera eventuellt samsok.py och lägg till egna bibliotek i sources.py. Det finns connectorklasser för Libra.se, Arena (inklusive den nya opacen i Book-IT 7.1), Mikromarc och Millennium i Göteborg/Malmö. De flesta kommuners kataloger bör fungera utan problem men det kan uppstå fel pga avvikelser i hur enskilda installationer är konfigurerade. 
 
-3) Ladda upp det via något FTP-program (ex Filezilla) till en webbserver med stöd för Python. Vi använder själva t.ex. ett vanligt webbhotellskonto från Loopia. 
+3) Ladda upp det via något FTP-program (ex Filezilla) till en webbserver med stöd för Python. Vi använder själva t.ex. ett vanligt webbhotellskonto från Loopia. Lägg skriptet i den mapp på servern där program skall läggas. Hos Loopia är det t.ex. cgi-bin vilket ger adressen www.mittwebbhotell.se/cgi-bin/samsok.py.
 
-4) Lägg skriptet i den mapp på servern där program skall läggas. Hos Loopia är det t.ex. cgi-bin vilket ger adressen www.mittwebbhotell.se/cgi-bin/samsok.py.
+5) Ställ filrättighetern till värdet 755 så att de blir både kör- och läsbara för allmänheten. Använder du t.ex. Filezilla högerklickar du på filerna och väljer "Filrättigheter" i menyn. 
 
-5) Ställ filrättighetern till värdet 755. Använder du t.ex. Filezilla högerklickar du på filerna och väljer "Filrättigheter" i menyn. 
+6) Namngivning - om du döper om skriptet till något annat än "samsok.py" behöver du också ändra sökvägen i koden som skapar "Submit"-knappen. 
 
-6) Om du döper om skriptet till något annat än "samsok.py" behöver du också ändra sökvägen i koden som skapar "Submit"-knappen. 
-
-7) Skriptet behöver biblioteket lxml (se lxml.de) installerat för att fungera.
+7) Installera lxml - skriptet behöver biblioteket lxml (se lxml.de) installerat för att fungera. Specifikt är det i dagsläget kopplingen till Malmö och Göteborg som använder lxml, men man får manuellt ta bort beroendet av lxml ur koden om man absolut inte vill använda lxml och inte har behov av Göteborg och Malmö. 
 
 8) Sökvägen "localLibFolder" i config-filen är endast till för vår Loopia-installation och kan raderas när man installerat lxml på vanligt sätt. 
 
