@@ -2,8 +2,7 @@ Samsökning
 ==========
 
 Beskrivning:
-En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. 
-Denna första version är tänkt som en demo av funktionaliteten och skall inte ses som skarp kod. Programmet erbjuder en enkel samsökningstjänst. 
+En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. Denna version stödjer Libra.se, Arena (inklusive den nya opacen för Book-IT 7.1), Mikromarc och Göteborg/Malmös Millennium-installationer. 
 
 Installation:  
 
