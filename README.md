@@ -25,11 +25,8 @@ Installation:
 9) Config-filen innehåller standardvärdena och vill du använda andra värden skapar du en fil i samma mapp som skripten ligger vid namn "samsok.cfg" och lägger in de inställningar du vill använda. På så vis kan du kopiera koden från Github när det kommer nya versioner utan att skriva över dina lokala inställningar. Den angivna asterisken i searchSources betyder "gör alla kataloger som är implementerade tillgängliga för användaren". Vill man bara använda en delmängd av de som finns färdigdefinierade i skripten anger man orterna i klartext separerade med komma. Såhär kan en egen samsok.cfg se ut: 
  
 [Samsok]  
-
 searchSources = Malmö, Göteborg, Laholm, Falkenberg  
-
 connectorTimeoutSeconds = 5  
-
 showTimeElapsed = True  
 
 
