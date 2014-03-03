@@ -2,7 +2,27 @@ Samsökning
 ==========
 
 Beskrivning:
-En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. Denna version stödjer Libra.se, Arena (inklusive den nya opacen för Book-IT 7.1), Mikromarc och Göteborg/Malmös Millennium-installationer. 
+
+En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. Denna version stödjer Libra.se, Arena (inklusive den nya opacen för Book-IT 7.1), Mikromarc och Göteborg/Malmös Millennium-installationer.
+
+Programmet fungerar så att det hämtar träfflistans första sida från varje bibliotekskatalog som söks och presenterar en sammanslagen träfflista. 
+
+==================
+
+Systemkrav: 
+
+För att köra programmet krävs en webbserver med Python och lxml (från lxml.de) installerat. Programfilerna behöver ha rättigheter på servern så att allmänheten kan både lösa och köra dem (vi använder värdet 755 - se installationsanvisningarna nedan). För att använda programmet använder man en vanlig webbläsare. För att funktionen att spara inställningen för vilka bibliotek som skall sökas behöver webbläsaren tillåta cookies. 
+
+==================
+
+Kända buggar: 
+
+Vid sökningar görs det inte tydligt hur många av den totala mängden träffar som hämtats. För Arena-bibliotek visas dessutom inte det hämtade antalet träffar snarare än den totala mängden vilket är inkonsekvent jämfört med de övriga katalogerna. 
+
+==================
+
+
+
 
 Installation:  
 
@@ -30,6 +50,8 @@ showTimeElapsed = True
 
 10) Navigera till den adress du gett skriptet och testa det. 
 
+===================
+
 Posta gärna tillbaka ändringar till oss om ni städar i koden eller bygger funktioner andra kan ha nytta av. Programmet är fri mjukvara och licensierat under version 3 av GPL-licensen.
 
-Kontakt: Programmet är skrivet av Viktor Sarge på Kultur i Halland - regionbibliotek. Viktor kan nås på adress 'viktor [punkt] sarge [snabela] regionhalland [punkt] se'. Programmet har utvecklats vidare på regionbibliotekets uppdrag av såväl Mattias Persson som Danni Efraim. 
+Kontakt: Programmet är skrevs ursprungligen av Viktor Sarge på Kultur i Halland - regionbibliotek. Viktor kan nås på adress 'viktor [punkt] sarge [snabela] regionhalland [punkt] se'. Programmet har utvecklats vidare på regionbibliotekets uppdrag av såväl Mattias Persson som Danni Efraim. 
