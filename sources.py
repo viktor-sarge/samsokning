@@ -14,7 +14,7 @@ Modify this file to add or remove searchable libraries.
 """
 
 import re
-from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser
+from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser, OlaParser
 
 QueryRegex = '@QUERY@'
 
@@ -136,8 +136,13 @@ def getMalmo(query):
                            'http://malmo.stadsbibliotek.org/search~S7*swe/?SUBMIT=Sök+%3E%3E%searchtype=X&searcharg=',
                            'Malmö', query)]
 
+def getOla(query):
+    return [SearchJob(OlaParser(), 'http://bibliotek.boras.se',
+                           'http://bibliotek.boras.se/search?query=@QUERY@&searchtype=Biblioteket&sort=Relevance&fLibId=00000000-0000-0000-0000-000000000000',
+                           'Borås', query)]
+
 def getAll(query):
-    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query)
+    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query)
 
 def getSearchjobs(query):
     """Return search jobs

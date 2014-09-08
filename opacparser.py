@@ -421,6 +421,12 @@ class BaseXmlParser:
             s = s.encode(self.encoding)
         return s
 
+    def _getElementText(self, element):
+        s = element.text.strip()
+        if isinstance(s, unicode):
+            s = s.encode(self.encoding)
+        return s
+
 class GotlibParser(BaseXmlParser):
 
     def parse(self,content,location,storage,baseurl, searchurl):
@@ -492,3 +498,34 @@ class MalmoParser(BaseXmlParser):
 
         storage.extend(hits)
         return str(len(hits))
+
+class OlaParser(BaseXmlParser):
+
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO(content), parser)
+        results = tree.xpath("//ol[@class='search-result clearfix']/li[@class='work-item clearfix']")
+        for result in results:
+            title = self._getInnerText(result.xpath(".//h3[@class='work-details-header']/a")[0])
+            try:
+                author = self._getInnerText(result.xpath(".//div[@class='work-details']/p")[0])
+                if author.lower().startswith("av:"):
+                    author = author[len("av:"):]
+            except IndexError:
+                author = ''
+            type = " / ".join([self._getElementText(x) for x in result.xpath(".//ol[@class='media-type-list']/li/a/span")])
+            year = self._getInnerText(result.xpath(".//h3[@class='work-details-header']/small")[0])[1:-1]
+            url = urlparse.urljoin(baseurl, result.xpath(".//h3[@class='work-details-header']/a/@href")[0])
+            storage.append(MediaItem(title, location, author, type, year, url))
+
+        return str(len(results))
