@@ -39,7 +39,7 @@ class SourceSelector:
             cookie = Cookie.SimpleCookie()
         cookie[self.COOKIE_NAME] = json.dumps(self._selected_sources)
         expiration = datetime.datetime.now() + datetime.timedelta(weeks=10)
-        cookie[self.COOKIE_NAME]["expires"] = expiration.strftime("%a, %d-%b-%Y %H:%M:%S PST")
+        cookie[self.COOKIE_NAME]["expires"] = expiration.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
         return cookie
 
     def getSelectedSources(self):
