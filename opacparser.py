@@ -529,3 +529,41 @@ class OlaParser(BaseXmlParser):
             storage.append(MediaItem(title, location, author, type, year, url))
 
         return str(len(results))
+
+class KohaParser(BaseXmlParser):
+
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO(content), parser)
+        results = tree.xpath("//td[@class='bibliocol']")
+        i = 1
+        for result in results:
+            i += 1
+            title = self._getInnerText(result.xpath(".//a[@class='title']")[0])
+            try:
+                author = self._getInnerText(result.xpath(".//span[@class='author']")[0])
+            except IndexError:
+                author = ''
+            type = self._getInnerText(result.xpath(".//span[@class='results_summary type']")[0])
+            try:
+                publisher = self._getInnerText(result.xpath(".//span[@class='results_summary publisher']")[0])
+                if len(publisher) >= 4 and publisher[-4:].isdigit():
+                    year = publisher[-4:]
+                else:
+                    year = ""
+            except IndexError:
+                year = ""
+            url = urlparse.urljoin(baseurl, result.xpath(".//a[@class='title']/@href")[0])
+            storage.append(MediaItem(title, location, author, type, year, url))
+
+        return str(len(results))
