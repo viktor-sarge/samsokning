@@ -477,8 +477,10 @@ class MalmoParser(BaseXmlParser):
             title = self._getInnerText(titletags[0])
             author = self._getInnerText(result.xpath(".//span[@class='briefcitTitle']")[0])
             type = result.xpath(".//span[@class='briefcitMedia']/img[1]/@alt")[0]
-            year = self._getInnerText(result.xpath(".//table/tr/td[5]")[0])
-            url = urlparse.urljoin(baseurl, result.xpath(".//span[@class='briefcitStatus']/a/@href")[0])
+            year = self._getInnerText(result.xpath(".//table/tr/td[5]")[0])[-4:]
+            if not year.isdigit():
+                year = ''
+            url = urlparse.urljoin(baseurl, titletags[0].xpath("@href")[0])
             hits.append(MediaItem(title, location, author, type, year, url))
 
         # Special case for only one hit
