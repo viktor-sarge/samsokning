@@ -44,13 +44,14 @@ def _executeSearchJob(searchjob):
     storage = []
 
     hitnumbers = None
+    totalhits = None
     try:
         page = connector.getpage(searchjob.searchurl)
-        hitnumbers = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl, searchjob.searchurl)
+        (hitnumbers, totalhits) = searchjob.parser.parse(page, searchjob.location, storage, searchjob.baseurl, searchjob.searchurl)
     except:
         pass
 
-    return (searchjob.location, hitnumbers, storage, time.time() - startTime)
+    return (searchjob.location, hitnumbers, totalhits, storage, time.time() - startTime)
 
 def performSearch(query, HTMLmachine):
     """Search, sort data and print result
@@ -71,8 +72,8 @@ def performSearch(query, HTMLmachine):
 
     for result in results:
         if (result[1]):
-            HTMLmachine.outputResultsnumbers(result[1], result[0], result[3])
-            storage.extend(result[2])
+            HTMLmachine.outputResultsnumbers(result[1], result[2], result[0], result[4])
+            storage.extend(result[3])
         else:
             HTMLmachine.outputError(result[0])
 

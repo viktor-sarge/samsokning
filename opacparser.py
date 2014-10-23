@@ -113,7 +113,7 @@ class LibraParser:
         
         return title, urlToOpac
 
-    def _parseMultiple(self,content,location,storage,baseurl, hitnumbers):
+    def _parseMultiple(self,content,location,storage,baseurl):
         #Second - take apart the results list and put the parts into the storage
         
         # Slicing away the html surrounding the list with the info we want
@@ -175,9 +175,9 @@ class LibraParser:
             storage.append(item)
             hitlist = hitlist[hitlist.find('</tr>')+5:]
 
-        return hitnumbers
+        return str(len(storage))
 
-    def _parseOne(self,content,location,storage,baseurl, hitnumbers, searchurl):
+    def _parseOne(self,content,location,storage,baseurl, searchurl):
             start = content.find(_kwlsinglestart)
             content = content[start:]
             stop = content.find(_kwlsingleend)
@@ -221,7 +221,7 @@ class LibraParser:
             item = MediaItem(title, location, author, '', year, searchurl)
             storage.append(item)
 
-            return hitnumbers
+            return str(len(storage))
 
     def parse(self,content,location,storage,baseurl, searchurl):
         """Parse content, add any contained items to storage and return number of items found as a string
@@ -245,9 +245,9 @@ class LibraParser:
         #print "Hitnumbers eftr slicing inuti parseLibra" + hitnumbers
         
         if(content.find(_kwlsingle) >= 0):
-            return self._parseOne(content,location,storage,baseurl, hitnumbers, searchurl)
+            return (self._parseOne(content,location,storage,baseurl, searchurl), '1')
         else:
-            return self._parseMultiple(content,location,storage,baseurl, hitnumbers)
+            return (self._parseMultiple(content,location,storage,baseurl), hitnumbers)
 
 _kwarecord = 'arena-record-details'
 
@@ -291,6 +291,13 @@ class ArenaParser:
         searchurl -- search url
 
         """
+        totalmatch = re.search('\d+-\d+ av (\d+)', content)
+        if totalmatch:
+            totalhits = totalmatch.group(1)
+        else:
+            totalhits = '0'
+
+
         kwindex = content.find(_kwarecord)
         content = content[kwindex:]
 
@@ -298,7 +305,7 @@ class ArenaParser:
         kwindex = content.find('arena-record-details')
         content = content[kwindex:]
         hitcount = 0
-        
+
         while(kwindex >= 0):
             records = []
             content = findDivs(content, records)
@@ -335,7 +342,7 @@ class ArenaParser:
             kwindex = content.find('arena-record-details')
             content = content[kwindex:]
 
-        return str(hitcount)
+        return (str(hitcount), totalhits)
 
 _kwmrecord = 'ctl00_PageContent_Control_hitlist1_RadGridHitList_ctl00__'
 _kwmurlregexp = 'ctl00_PageContent_Control_hitlist1_RadGridHitList_ctl00_ctl[0-9]+_lHyper'
@@ -358,6 +365,12 @@ class MikromarcParser:
         """
         hitcount = 0
         kwindex = content.find(_kwmrecord)
+
+        totalmatch = re.search('<span id="ctl00_PageContent_Control_hitlist1_LabelSearchHeader">.*?<B>(\d+)</B>.*?</span>', content, re.IGNORECASE)
+        if totalmatch:
+            totalhits = totalmatch.group(1)
+        else:
+            totalhits = '0'
 
         while(kwindex >= 0):
             title = ''
@@ -410,7 +423,7 @@ class MikromarcParser:
 
             kwindex = content.find(_kwmrecord)
 
-        return str(hitcount)
+        return (str(hitcount), totalhits)
 
 class BaseXmlParser:
     encoding = 'utf-8'
@@ -442,8 +455,25 @@ class GotlibParser(BaseXmlParser):
         """
         parser = etree.HTMLParser()
         tree = etree.parse(StringIO(content), parser)
+
+        totalhitsspan = tree.xpath("//span[@class='noResultsHideMessage']")
+        if totalhitsspan and len(totalhitsspan) > 0:
+            spantext = self._getInnerText(totalhitsspan[0])
+            totalmatch = re.search('\d+ - \d+ .*? (\d+)', spantext)
+            if totalmatch:
+                totalhits = totalmatch.group(1)
+            else:
+                totalhits = '0'
+        else:
+            totalhits = '0'
+
         results = tree.xpath("//table[@class='browseResult']/tr")
         for result in results:
+            isProgram = result.xpath('.//span[contains(@id, "programMediaTypeInsertComponent")]')
+            if len(isProgram) > 0:
+                # Program item, skip this
+                continue
+
             title = self._getInnerText(result.xpath(".//div[@class='dpBibTitle']")[0])
             author = self._getInnerText(result.xpath(".//div[@class='dpBibAuthor']")[0])
             type = self._getInnerText(result.xpath(".//span[@class='itemMediaDescription']")[0])
@@ -451,7 +481,7 @@ class GotlibParser(BaseXmlParser):
             url = urlparse.urljoin(baseurl, result.xpath(".//div[@class='dpBibTitle']/a/@href")[0])
             storage.append(MediaItem(title, location, author, type, year, url))
 
-        return str(len(results))
+        return (str(len(storage)), totalhits)
 
 class MalmoParser(BaseXmlParser):
     def parse(self,content,location,storage,baseurl, searchurl):
@@ -469,6 +499,19 @@ class MalmoParser(BaseXmlParser):
         parser = etree.HTMLParser()
         tree = etree.parse(StringIO(content), parser)
         results = tree.xpath("//tr[@class='briefCitRow']")
+
+        totalhitsspan = tree.xpath("//td[@class='browseHeaderData']")
+        if totalhitsspan and len(totalhitsspan) > 0:
+            spantext = self._getInnerText(totalhitsspan[0])
+            totalmatch = re.search('\d+-\d+ .*? (\d+)', spantext)
+            if totalmatch:
+                totalhits = totalmatch.group(1)
+            else:
+                totalhits = '0'
+        else:
+            totalhits = '0'
+
+
         hits = []
         for result in results:
             titletags = result.xpath(".//span[@class='briefcitTitle']/../a")
@@ -499,7 +542,7 @@ class MalmoParser(BaseXmlParser):
                 hits.append(MediaItem(title, location, author, type, year, url))
 
         storage.extend(hits)
-        return str(len(hits))
+        return (str(len(hits)), totalhits)
 
 class OlaParser(BaseXmlParser):
 
@@ -516,6 +559,19 @@ class OlaParser(BaseXmlParser):
         """
         parser = etree.HTMLParser()
         tree = etree.parse(StringIO(content), parser)
+
+        totalhitsspan = tree.xpath("//span[@class='result-text']")
+        if totalhitsspan and len(totalhitsspan) > 0:
+            spantext = self._getInnerText(totalhitsspan[0])
+            totalmatch = re.search('(\d+)', spantext)
+            if totalmatch:
+                totalhits = totalmatch.group(1)
+            else:
+                totalhits = '0'
+        else:
+            totalhits = '0'
+
+
         results = tree.xpath("//ol[@class='search-result clearfix']/li[@class='work-item clearfix']")
         for result in results:
             title = self._getInnerText(result.xpath(".//h3[@class='work-details-header']/a")[0])
@@ -530,7 +586,7 @@ class OlaParser(BaseXmlParser):
             url = urlparse.urljoin(baseurl, result.xpath(".//h3[@class='work-details-header']/a/@href")[0])
             storage.append(MediaItem(title, location, author, type, year, url))
 
-        return str(len(results))
+        return (str(len(results)), totalhits)
 
 class KohaParser(BaseXmlParser):
 
@@ -547,6 +603,18 @@ class KohaParser(BaseXmlParser):
         """
         parser = etree.HTMLParser()
         tree = etree.parse(StringIO(content), parser)
+
+        totalhitsspan = tree.xpath("//p[@id='numresults']")
+        if totalhitsspan and len(totalhitsspan) > 0:
+            spantext = self._getInnerText(totalhitsspan[0])
+            totalmatch = re.search('(\d+)', spantext)
+            if totalmatch:
+                totalhits = totalmatch.group(1)
+            else:
+                totalhits = '0'
+        else:
+            totalhits = '0'
+
         results = tree.xpath("//td[@class='bibliocol']")
         i = 1
         for result in results:
@@ -568,4 +636,4 @@ class KohaParser(BaseXmlParser):
             url = urlparse.urljoin(baseurl, result.xpath(".//a[@class='title']/@href")[0])
             storage.append(MediaItem(title, location, author, type, year, url))
 
-        return str(len(results))
+        return (str(len(results)), totalhits)
