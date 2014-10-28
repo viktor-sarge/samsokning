@@ -15,7 +15,7 @@ Modify this file to add or remove searchable libraries.
 
 import re
 from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser, OlaParser, KohaParser, \
-    MinabibliotekParser, SsbParser
+    MinabibliotekParser, SsbParser, XsearchParser
 
 QueryRegex = '@QUERY@'
 
@@ -30,15 +30,31 @@ class SearchJob:
     query -- the query to search for; any space should be replaced by a +
 
     """
-    def __init__(self, parser, baseurl, searchurl, location, query):
+    def __init__(self, parser, baseurl, searchurl, location, query, gotosearchurl = None):
         self.parser = parser
         self.baseurl = baseurl
         self.location = location
+        self.gotosearchurl = gotosearchurl
 
         if(searchurl.find(QueryRegex) >= 0):
             self.searchurl = re.sub(QueryRegex, query, searchurl)
         else:
             self.searchurl = searchurl + query
+
+        if gotosearchurl:
+            if(gotosearchurl.find(QueryRegex) >= 0):
+                self.gotosearchurl = re.sub(QueryRegex, query, gotosearchurl)
+            else:
+                self.gotosearchurl = gotosearchurl + query
+
+    # Some search engines may use one URL for searching (like an API) while wanting
+    # to redirect the user to a different one when the library link is clicked.
+    # This method allows to return the right one to go to with the link
+    def getSearchurl(self):
+        if self.gotosearchurl is None:
+            return self.searchurl
+        else:
+            return self.gotosearchurl
 
 def getAssortment(query):
     result = []
@@ -157,8 +173,13 @@ def getSsb(query):
                            'https://biblioteket.stockholm.se/sok?freetext=',
                            'Stockholms Stadsbibliotek', query)]
 
+def getXsearch(query):
+    return [SearchJob(XsearchParser(), 'http://www.sverigesdepabibliotekochlanecentral.se/',
+                           'http://libris.kb.se/xsearch?query=@QUERY@%20AND%20bibl:umdp&format=json&holdings=true&n=200',
+                           'Depåbiblioteket i Umeå', query, 'http://libris.kb.se/hitlist?q=@QUERY@+bib%3aumdp&d=libris&m=10&p=1&s=r')]
+
 def getAll(query):
-    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query) + getKoha(query) + getMinabibliotek(query) + getSsb(query)
+    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query) + getKoha(query) + getMinabibliotek(query) + getSsb(query) + getXsearch(query)
 
 def getSearchjobs(query):
     """Return search jobs

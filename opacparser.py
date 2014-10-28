@@ -13,6 +13,8 @@ import re
 from lxml import etree
 from StringIO import StringIO
 import urlparse
+import json
+import cgi
 
 class MediaItem:
     """An item in a library"""
@@ -682,6 +684,7 @@ class MinabibliotekParser(BaseXmlParser):
 
         return (str(len(results)), totalhits)
 
+
 class SsbParser(BaseXmlParser):
     def parse(self,content,location,storage,baseurl, searchurl):
         """Parse content, add any contained items to storage and return number of items found as a string
@@ -718,6 +721,36 @@ class SsbParser(BaseXmlParser):
             if (year.endswith(",")):
                 year = year[0:-1]
             url = urlparse.urljoin(baseurl, result.xpath(".//div[@class='title']/h2/a/@href")[0])
+            storage.append(MediaItem(title, location, author, type, year, url))
+
+        return (str(len(storage)), totalhits)
+
+class XsearchParser:
+    def htmlCode(self, s):
+        return cgi.escape(s).encode('ascii', 'xmlcharrefreplace')
+
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+
+        js = json.loads(content, 'utf-8')['xsearch']
+
+        totalhits = str(js['records'])
+
+        for result in js['list']:
+            title = self.htmlCode(result['title']) if result.has_key('title') else ''
+            author = self.htmlCode(result['creator']) if result.has_key('creator') else ''
+            type = self.htmlCode(result['type']) if result.has_key('type') else ''
+            year = self.htmlCode(result['date']) if result.has_key('date') else ''
+            url = self.htmlCode(result['identifier']) if result.has_key('identifier') else ''
             storage.append(MediaItem(title, location, author, type, year, url))
 
         return (str(len(storage)), totalhits)
