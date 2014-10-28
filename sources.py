@@ -15,7 +15,7 @@ Modify this file to add or remove searchable libraries.
 
 import re
 from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser, OlaParser, KohaParser, \
-    MinabibliotekParser
+    MinabibliotekParser, SsbParser
 
 QueryRegex = '@QUERY@'
 
@@ -152,8 +152,13 @@ def getMinabibliotek(query):
                            'http://www.minabibliotek.se/search?query=@QUERY@&sort=Relevance&snabbsokknapp=Sök&searchtype=Biblioteket&fLibId=00000000-0000-0000-0000-000000000000',
                            'Minabibliotek', query)]
 
+def getSsb(query):
+    return [SearchJob(SsbParser(), 'https://biblioteket.stockholm.se',
+                           'https://biblioteket.stockholm.se/sok?freetext=',
+                           'Stockholms Stadsbibliotek', query)]
+
 def getAll(query):
-    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query) + getKoha(query) + getMinabibliotek(query)
+    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query) + getKoha(query) + getMinabibliotek(query) + getSsb(query)
 
 def getSearchjobs(query):
     """Return search jobs

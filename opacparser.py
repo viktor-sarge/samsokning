@@ -681,3 +681,43 @@ class MinabibliotekParser(BaseXmlParser):
             storage.append(MediaItem(title, location, author, type, year, url))
 
         return (str(len(results)), totalhits)
+
+class SsbParser(BaseXmlParser):
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO(content), parser)
+
+        totalhitsspan = tree.xpath("//div[@id='results-filter']/p[@class='total']/em[3]")
+        if totalhitsspan and len(totalhitsspan) > 0:
+            totalhits = self._getInnerText(totalhitsspan[0])
+        else:
+            totalhits = '0'
+
+
+        # The search result HTML is malformed and the list elements do not get properly parsed
+        # as siblings, so we have to use this slightly more complicated expression to get the right
+        # divs from within the list items instead.
+        results = tree.xpath("//ol[@class='results-icon']//div[string(number(@id)) != 'NaN' and @class='row-fluid']")
+        for result in results:
+            title = self._getInnerText(result.xpath(".//div[@class='title']/h2/a/b")[0])
+            author = self._getInnerText(result.xpath(".//span[@class='author']")[0])
+            type = self._getInnerText(result.xpath(".//span[@class='mediatype']")[0])
+            if type.startswith("(") and type.endswith(")"):
+                type = type[1:-1]
+            year = self._getInnerText(result.xpath(".//span[@class='year']")[0])
+            if (year.endswith(",")):
+                year = year[0:-1]
+            url = urlparse.urljoin(baseurl, result.xpath(".//div[@class='title']/h2/a/@href")[0])
+            storage.append(MediaItem(title, location, author, type, year, url))
+
+        return (str(len(storage)), totalhits)
