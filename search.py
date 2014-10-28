@@ -51,7 +51,7 @@ def _executeSearchJob(searchjob):
     except:
         pass
 
-    return (searchjob.location, hitnumbers, totalhits, storage, time.time() - startTime)
+    return (searchjob.location, hitnumbers, totalhits, storage, time.time() - startTime, searchjob.searchurl)
 
 def performSearch(query, HTMLmachine):
     """Search, sort data and print result
@@ -72,7 +72,7 @@ def performSearch(query, HTMLmachine):
 
     for result in results:
         if (result[1]):
-            HTMLmachine.outputResultsnumbers(result[1], result[2], result[0], result[4])
+            HTMLmachine.outputResultsnumbers(result[1], result[2], result[0], result[5], result[4])
             storage.extend(result[3])
         else:
             HTMLmachine.outputError(result[0])

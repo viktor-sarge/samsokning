@@ -65,7 +65,7 @@ class HTMLwriter:
         print '<input type="submit" value="S&ouml;k" data-role="button" data-inline="true">'
         print '</form>'
 
-    def outputResultsnumbers(self,numbers, totalnumbers, location, timeElapsed = None):
+    def outputResultsnumbers(self,numbers, totalnumbers, location, searchUrl, timeElapsed = None):
         """Print the number of hits at a library
         
         Arguments
@@ -75,7 +75,7 @@ class HTMLwriter:
         """
 
         if numbers:
-            print 'H&auml;mtade ' + numbers + ' tr&auml;ffar av ' + totalnumbers + ' i ' + location,
+            print 'H&auml;mtade ' + numbers + ' tr&auml;ffar av ' + totalnumbers + ' i <a target="_blank" href="' + searchUrl + '">' + location + "</a>",
         else: 
             print 'Din s&ouml;kning gav 0 tr&auml;ffar i ' + location,
 
