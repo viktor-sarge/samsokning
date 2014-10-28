@@ -14,7 +14,8 @@ Modify this file to add or remove searchable libraries.
 """
 
 import re
-from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser, OlaParser, KohaParser
+from opacparser import LibraParser, ArenaParser, MikromarcParser, GotlibParser, MalmoParser, OlaParser, KohaParser, \
+    MinabibliotekParser
 
 QueryRegex = '@QUERY@'
 
@@ -146,8 +147,13 @@ def getKoha(query):
                            'http://hylte.bibkat.se/cgi-bin/koha/opac-search.pl?q=@QUERY@&branch_group_limit=',
                            'Hylte', query)]
 
+def getMinabibliotek(query):
+    return [SearchJob(MinabibliotekParser(), 'http://www.minabibliotek.se',
+                           'http://www.minabibliotek.se/search?query=@QUERY@&sort=Relevance&snabbsokknapp=Sök&searchtype=Biblioteket&fLibId=00000000-0000-0000-0000-000000000000',
+                           'Minabibliotek', query)]
+
 def getAll(query):
-    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query) + getKoha(query)
+    return getLibra(query) + getMikromarc(query) + getArena(query) + getGotlib(query) + getMalmo(query) + getOla(query) + getKoha(query) + getMinabibliotek(query)
 
 def getSearchjobs(query):
     """Return search jobs

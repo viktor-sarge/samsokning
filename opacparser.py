@@ -637,3 +637,47 @@ class KohaParser(BaseXmlParser):
             storage.append(MediaItem(title, location, author, type, year, url))
 
         return (str(len(results)), totalhits)
+
+class MinabibliotekParser(BaseXmlParser):
+
+    def parse(self,content,location,storage,baseurl, searchurl):
+        """Parse content, add any contained items to storage and return number of items found as a string
+
+        Arguments
+        content -- (html-)content to parse
+        location -- library location
+        storage -- list to which MediaItems will be added as they are found in content
+        baseurl -- base url to media content
+        searchurl -- search url
+
+        """
+        parser = etree.HTMLParser()
+        tree = etree.parse(StringIO(content), parser)
+
+        totalhitsspan = tree.xpath("//form[@id='SearchResultForm']/p[@class='information']")
+        if totalhitsspan and len(totalhitsspan) > 0:
+            spantext = self._getInnerText(totalhitsspan[0])
+            totalmatch = re.search('(\d+)', spantext)
+            if totalmatch:
+                totalhits = totalmatch.group(1)
+            else:
+                totalhits = '0'
+        else:
+            totalhits = '0'
+
+
+        results = tree.xpath("//form[@id='MemorylistForm']/ol[@class='CS_list-container']/li")
+        for result in results:
+            title = self._getInnerText(result.xpath(".//h3[@class='title']/a")[0])
+            try:
+                author = self._getInnerText(result.xpath(".//p[@class='author']")[0])
+                if author.lower().startswith("av:"):
+                    author = author[len("av:"):]
+            except IndexError:
+                author = ''
+            type = " / ".join(self._getElementText(x) for x in result.xpath(".//ol[@class='media-type CS_clearfix']/li/a/span"))
+            year = self._getInnerText(result.xpath(".//span[@class='date']")[0])
+            url = urlparse.urljoin(baseurl, result.xpath(".//h3[@class='title']/a/@href")[0])
+            storage.append(MediaItem(title, location, author, type, year, url))
+
+        return (str(len(results)), totalhits)
