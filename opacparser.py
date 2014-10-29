@@ -293,7 +293,7 @@ class ArenaParser:
         searchurl -- search url
 
         """
-        totalmatch = re.search('\d+-\d+ av (\d+)', content)
+        totalmatch = re.search('<span class="feedbackPanelINFO">.*?(\d+).*?</span>', content)
         if totalmatch:
             totalhits = totalmatch.group(1)
         else:
