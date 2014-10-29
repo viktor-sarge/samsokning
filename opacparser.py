@@ -297,7 +297,11 @@ class ArenaParser:
         if totalmatch:
             totalhits = totalmatch.group(1)
         else:
-            totalhits = '0'
+            totalmatch = re.search('<span.*?">\d+-\d+ .*? (\d+)</span>', content)
+            if totalmatch:
+                totalhits = totalmatch.group(1)
+            else:
+                totalhits = '0'
 
 
         kwindex = content.find(_kwarecord)
