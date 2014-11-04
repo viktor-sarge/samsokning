@@ -3,7 +3,7 @@ Samsökning
 
 Beskrivning:
 
-En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. Denna version stödjer Libra.se, Koha, Arena (inklusive den nya opacen för Book-IT 7.1), Mikromarc, CS Library och Göteborg/Malmös Millennium-installationer.
+En enkel samsökningstjänst tänkt för fjärrlånebibliotekarier som sörjer frånfället av Bibliotek24. Denna version stödjer Libra.se, Koha, Arena (inklusive den nya opacen för Book-IT 7.1), Mikromarc, CS Library och Göteborg/Malmös Millennium-installationer samt Libris XSearch-API. 
 
 Programmet fungerar så att det hämtar träfflistans första sida från varje bibliotekskatalog som söks och presenterar en sammanslagen träfflista. 
 
@@ -13,11 +13,6 @@ Systemkrav:
 
 För att köra programmet krävs en webbserver med Python och lxml (från lxml.de) installerat. Programfilerna behöver ha rättigheter på servern så att allmänheten kan både lösa och köra dem (vi använder värdet 755 - se installationsanvisningarna nedan). För att använda programmet använder man en vanlig webbläsare. För att funktionen att spara inställningen för vilka bibliotek som skall sökas behöver webbläsaren tillåta cookies. 
 
-==================
-
-Kända buggar: 
-
-Vid sökningar görs det inte tydligt hur många av den totala mängden träffar som hämtats. För Arena-bibliotek visas dessutom inte det hämtade antalet träffar snarare än den totala mängden vilket är inkonsekvent jämfört med de övriga katalogerna. 
 
 ==================
 
