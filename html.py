@@ -17,7 +17,7 @@ Print html page.
 """
 class HTMLwriter:
     'A class to handle output of HTML'
-
+    
     def __init__(self):
         self._prioroutput = False
 
@@ -33,6 +33,8 @@ class HTMLwriter:
         print '<meta name="viewport" content="width=device-width, initial-scale=1">'
         print '<title>' + 'Sams&ouml;k Halland' + '</title>'
         print '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css" />'
+        print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
+        print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
         print '</head>'
         print '<body>'
         print '<div data-role="page">'
@@ -48,16 +50,14 @@ class HTMLwriter:
         print '<a href="#sourcespanel">V&auml;lj kataloger</a><h1>Sams&ouml;k Halland</h1><a href="#infopanel">Info</a>'
         print '</div>'
         print '<div data-role="content">'
-
+    
     def closeBasicPage(self):
         """Print the end of the page"""
         print '</div>'
         print '</div>'
-        print '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>'
-        print '<script src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>'
         print '</body>'
         print '</html>'
-
+        
     def outputSearchbox(self):
         """Print searchbox"""
         print '<form name="input" action="samsok.py" method="get">'
@@ -67,7 +67,7 @@ class HTMLwriter:
 
     def outputResultsnumbers(self,numbers, location, timeElapsed = None):
         """Print the number of hits at a library
-
+        
         Arguments
         numbers -- hit count
         location -- library
@@ -76,7 +76,7 @@ class HTMLwriter:
 
         if numbers:
             print 'Din s&ouml;kning gav ' + numbers + ' tr&auml;ffar i ' + location,
-        else:
+        else: 
             print 'Din s&ouml;kning gav 0 tr&auml;ffar i ' + location,
 
         if config.parser.getboolean(config.defaultSection, 'showTimeElapsed') and timeElapsed:
@@ -152,7 +152,7 @@ class HTMLwriter:
                 self._tdPrint(item.url)
                 print '</tr>'
             print '</tbody></table>'
-        else:
+        else: 
             print '<p>'
             print '<ul data-role="listview" data-filter="true" data-filter-placeholder="S&ouml;k i tr&auml;fflistan" data-autodividers="true">'
             for item in storage:
@@ -166,7 +166,7 @@ class HTMLwriter:
                 print '</p>'
                 print '<p style="padding-left:2em;">' + item.location + '</p>'
                 print '<a href="http://libris.kb.se/hitlist?d=libris&q=' + item.getLibrisQuery() + '">S&ouml;k i Libris</a>'
-                print "</li>"
+                print "</li>"               
             print '</ul>'
             print '</p>'
 
